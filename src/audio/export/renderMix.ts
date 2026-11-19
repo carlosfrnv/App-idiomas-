@@ -77,3 +77,12 @@ export function peakOf(buf: AudioBuffer): number {
   }
   return p;
 }
+
+/** Documento con una sola pista audible (para stems). Sin efectos/volumen de master si `preMaster`. */
+export function soloDoc(doc: ProjectDoc, trackId: string, preMaster = true): ProjectDoc {
+  return {
+    ...doc,
+    tracks: doc.tracks.map((t) => ({ ...t, solo: false, mute: t.id !== trackId })),
+    ...(preMaster ? { masterEffects: [], masterVolume: 1 } : {}),
+  };
+}

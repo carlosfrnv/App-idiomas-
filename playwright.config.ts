@@ -14,6 +14,8 @@ export default defineConfig({
     acceptDownloads: true,
     permissions: ['microphone'],
     launchOptions: {
+      // nombres de archivo con tildes en las descargas (el contenedor no define locale UTF-8)
+      env: { ...process.env, LANG: 'C.UTF-8', LC_ALL: 'C.UTF-8' },
       args: [
         '--autoplay-policy=no-user-gesture-required',
         '--use-fake-ui-for-media-stream',
