@@ -9,6 +9,8 @@ import { ProjectsScreen } from '@/features/projects/ProjectsScreen';
 import { Toasts } from '@/components/ui/Toasts';
 import { ConfirmHost } from '@/components/ui/Confirm';
 import { APP_NAME } from '@/config/app';
+import { initCloud } from '@/cloud/auth';
+import { AuthDialog, ProfileDialog } from '@/features/account/AuthDialogs';
 
 /** Conecta el motor de audio al documento: cada cambio del store se reconcilia en el grafo. */
 function useEngineBinding() {
@@ -31,6 +33,7 @@ export function App() {
   const [booting, setBooting] = useState(true);
 
   useEffect(() => startAutosave(), []);
+  useEffect(() => { void initCloud(); }, []);
   useEffect(() => { document.title = projectId ? `${useProject.getState().name} · ${APP_NAME}` : APP_NAME; }, [projectId]);
 
   // recuperar el último proyecto abierto (tras cerrar o recargar el navegador)
@@ -51,6 +54,8 @@ export function App() {
       ) : projectId ? <Studio /> : <ProjectsScreen />}
       <Toasts />
       <ConfirmHost />
+      <AuthDialog />
+      <ProfileDialog />
     </>
   );
 }

@@ -34,7 +34,7 @@ create table if not exists public.subscriptions (
 
 -- ---------------------------------------------------------------- proyectos y audio
 create table if not exists public.projects (
-  id uuid primary key default gen_random_uuid(),
+  id text primary key default gen_random_uuid()::text,   -- los IDs se generan en el cliente (prj_…)
   owner_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name text not null check (char_length(name) between 1 and 120),
   doc jsonb not null,                           -- ProjectDoc (src/types/project.ts)
@@ -47,7 +47,7 @@ create table if not exists public.projects (
 create index if not exists projects_owner_updated on public.projects (owner_id, updated_at desc);
 
 create table if not exists public.assets (
-  id uuid primary key default gen_random_uuid(),
+  id text primary key default gen_random_uuid()::text,   -- ast_…
   owner_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name text not null,
   mime_type text not null check (mime_type like 'audio/%'),
@@ -61,8 +61,8 @@ create table if not exists public.assets (
 );
 
 create table if not exists public.project_assets (
-  project_id uuid not null references public.projects (id) on delete cascade,
-  asset_id uuid not null references public.assets (id) on delete restrict,
+  project_id text not null references public.projects (id) on delete cascade,
+  asset_id text not null references public.assets (id) on delete restrict,
   primary key (project_id, asset_id)
 );
 

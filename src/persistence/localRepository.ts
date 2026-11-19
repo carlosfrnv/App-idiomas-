@@ -2,6 +2,8 @@ import type { AudioAsset, ProjectMeta, StoredAsset, StoredProject } from '@/type
 import type { ProjectRepository } from './repository';
 import { idbDelete, idbGet, idbGetAll, idbPut } from './idb';
 import { uid } from '@/lib/id';
+import { HybridRepository } from './hybridRepository';
+import type { CloudBackend } from '@/cloud/backend';
 
 export class LocalRepository implements ProjectRepository {
   async listProjects(): Promise<ProjectMeta[]> {
@@ -59,7 +61,14 @@ export class LocalRepository implements ProjectRepository {
   }
 }
 
-export const repository: ProjectRepository = new LocalRepository();
+export const localRepository = new LocalRepository();
+
+let activeCloud: CloudBackend | null = null;
+/** Activa/desactiva la nube (al iniciar o cerrar sesión). */
+export function setCloudBackend(b: CloudBackend | null) { activeCloud = b; }
+
+/** Repositorio que usa la app: local + nube si hay sesión. */
+export const repository = new HybridRepository(localRepository, () => activeCloud);
 
 /** Solicita almacenamiento persistente (evita purgas, importante en Safari). */
 export async function requestPersistentStorage(): Promise<boolean> {

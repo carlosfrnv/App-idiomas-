@@ -50,6 +50,12 @@ Las claves sólo las lee el servidor (`server/lyricsAi.ts`, expuesto en `/api/ly
 Para publicar la web, despliega en un hosting con funciones (p. ej. Vercel: `api/lyrics.ts`) y define allí las mismas variables.
 Si un modelo se retira, cambia `GROQ_MODEL` / `GEMINI_MODEL`.
 
+## Funciones de producción
+- **Corrección de tono**: selecciona un clip de voz → pestaña **Clip** → tonalidad/escala (o *Detectar*) → Natural o Robótico → *Afinar voz*. No destructivo.
+- **Automatización**: botón **A** de la pista → clic en el carril para añadir puntos (volumen o panorama).
+- **Exportar**: WAV o MP3, canción completa o región del bucle, o **pistas separadas** en un ZIP.
+- **Cuentas y nube** (opcional): ver [docs/PHASE3_SETUP.md](docs/PHASE3_SETUP.md).
+
 ## Documentación
 - [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) — arquitectura, limitaciones del navegador, fases
 - [PROGRESS.md](PROGRESS.md) — estado, pruebas, limitaciones y próximos pasos

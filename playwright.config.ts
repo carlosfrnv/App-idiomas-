@@ -34,7 +34,7 @@ export default defineConfig({
       url: `http://localhost:${PORT}`,
       reuseExistingServer: true,
       timeout: 60_000,
-      env: { GROQ_API_KEY: 'test-key', GROQ_BASE_URL: 'http://localhost:5199/openai/v1', GEMINI_API_KEY: '' },
+      env: { GROQ_API_KEY: 'test-key', GROQ_BASE_URL: 'http://localhost:5199/openai/v1', GEMINI_API_KEY: '', VITE_SUPABASE_URL: 'http://supabase.test', VITE_SUPABASE_ANON_KEY: 'anon-test-key' },
     },
   ],
 });

@@ -6,8 +6,8 @@
 | --- | --- |
 | 1 — Aplicación base funcional | ✅ **Completada y verificada** (20/20 criterios de aceptación automatizados) |
 | 2 — Edición y mezcla | ✅ **Completada y verificada** (E2E con análisis numérico del audio exportado) |
-| 3 — Plataforma online | 🟡 Preparada (esquema SQL + RLS + interfaz de repositorio). **Bloqueada: requiere proyecto Supabase del usuario** |
-| 4 — Producción avanzada | ⏳ Pendiente (corrección de tono planificada, no expuesta como funcional) |
+| 3 — Plataforma online | ✅ Implementada y probada con Supabase simulado (registro, sync, otro dispositivo, RLS). Pendiente: verificación con proyecto real del usuario |
+| 4 — Producción avanzada | ✅ Corrección de tono real (YIN + TD-PSOLA), automatización volumen/pan, MP3, stems, exportar región |
 | Extra — Asistente de letras IA | ✅ Completado (Groq/Gemini vía servidor, sílabas y rimas offline). Requiere claves gratuitas del usuario para generar texto |
 | 5 — Producto comercial | 🟡 Modelo de planes/límites preparado (`src/config/plans.ts`, desactivado) |
 
@@ -36,13 +36,28 @@
 - [x] Vista simplificada en móvil, adaptación a tableta
 
 ## Pruebas (última ejecución)
-- **Vitest**: 53 pruebas unitarias ✅ (WAV, picos, biquad, curva del compresor, saturación, docOps, historial, sincronización de clips, medición, alineación de grabación, IndexedDB)
+- **Vitest**: 101 pruebas unitarias ✅ (última ejecución; ver más abajo el detalle histórico)
+- **Playwright**: 18 pruebas E2E ✅ (aceptación, edición, efectos, robustez, letras IA, exportación, automatización, afinación, nube)
+- Detalle inicial — **Vitest**: 53 pruebas unitarias ✅ (WAV, picos, biquad, curva del compresor, saturación, docOps, historial, sincronización de clips, medición, alineación de grabación, IndexedDB)
 - **Playwright** (Chromium real, micrófono simulado): 11 pruebas E2E ✅
   - `acceptance.spec.ts` — los 20 pasos de la sección 20, incluido el análisis del WAV exportado
     (tono de la instrumental a 0,500 ± 0,01; energía de la voz presente; con mute desaparece)
   - `phase2-editing.spec.ts` — dividir/mover/recortar/duplicar/eliminar + deshacer/rehacer; pistas
   - `phase2-effects.spec.ts` — EQ (medido vs. curva: error < 0,3 dB), compresor y makeup, reverb, delay, filtro, saturación, preset; pan, ganancia de clip, master, fundidos
   - `robustness.spec.ts` — permiso denegado, archivo inválido, bucle, noise gate, persistencia de efectos
+
+## Fase 4 — producción avanzada
+- [x] Corrección de tono: YIN (F0), escala con intensidad y velocidad, TD-PSOLA (conserva formantes y duración),
+      natural/robótico, 6 escalas, detección de tonalidad, gráfico, Web Worker, no destructivo (restaurar/deshacer).
+      60 s de voz estéreo en ~0,8 s. Pendiente: monitorización en tiempo real mientras se graba.
+- [x] Automatización de volumen y panorama dibujable por pista (tiempo real, bucles y exportación). Pendiente: automatizar parámetros de efectos.
+- [x] Exportación MP3 128–320 kbps (LAME/LGPL, módulo aparte), región del bucle, stems por pista en ZIP.
+- Pruebas: algoritmo de afinación (450 Hz → 440 Hz), E2E de afinación, automatización y exportaciones analizando el audio.
+
+## Fase 3 — cuentas y nube
+- [x] Supabase Auth (registro, login, recuperar/cambiar contraseña, perfil), repositorio híbrido local+nube, migración de proyectos locales.
+- [x] E2E contra Supabase simulado (Auth + PostgREST + Storage con RLS): registro, subida, otro dispositivo, aislamiento entre usuarios.
+- Pendiente: probar con un proyecto real (ver docs/PHASE3_SETUP.md).
 
 ## Asistente de letras (añadido)
 - [x] Editor de letra guardado en el proyecto (deshacer/rehacer, autoguardado), etiquetas de sección
@@ -63,10 +78,9 @@
 
 ## Limitaciones conocidas
 - La latencia depende del dispositivo; se compensa (automática + manual) pero no se elimina. Recomendado: auriculares.
-- MP3 no disponible (requiere codificador con licencia compatible) — opción visible pero deshabilitada.
-- Exportar rango / pistas separadas: fase posterior.
+- MP3 usa LAME (LGPL-3.0) como módulo independiente: ver THIRD_PARTY_NOTICES.md.
 - Las pruebas E2E se ejecutan en Chromium; Safari/Firefox no se han probado automáticamente en este entorno.
-- Los datos viven en el navegador (IndexedDB) hasta la Fase 3.
+- Sin variables de Supabase la app es 100 % local (IndexedDB).
 - El compresor usa `DynamicsCompressorNode` (detector y rodilla fijados por la especificación).
 
 ## Próximos pasos

@@ -11,6 +11,7 @@ import { Logo } from '@/features/topbar/TopBar';
 import { APP_NAME } from '@/config/app';
 import { toast } from '@/state/toastStore';
 import { engine } from '@/audio/engine/AudioEngine';
+import { cloudConfigured, useAuth } from '@/cloud/auth';
 
 function Thumb({ data, color = '#8B5CF6' }: { data?: number[]; color?: string }) {
   const n = data?.length ?? 0;
@@ -61,7 +62,8 @@ export function ProjectsScreen() {
   const [list, setList] = useState<ProjectMeta[] | null>(null);
   const [busy, setBusy] = useState<'new' | 'demo' | null>(null);
   const refresh = useCallback(() => { repository.listProjects().then(setList).catch((e) => { setList([]); toast.error('No se pudo leer el almacenamiento', (e as Error).message); }); }, []);
-  useEffect(refresh, [refresh]);
+  const user = useAuth((s) => s.user);
+  useEffect(refresh, [refresh, user]);
 
   const create = async (demo: boolean) => {
     setBusy(demo ? 'demo' : 'new');
@@ -78,7 +80,10 @@ export function ProjectsScreen() {
       <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-line bg-bg/85 px-4 backdrop-blur md:px-8">
         <Logo />
         <div className="flex-1" />
-        <span className="hidden text-xs text-dim sm:block">Modo local · tus proyectos se guardan en este navegador</span>
+        {cloudConfigured ? (user
+          ? <button onClick={() => useAuth.getState().set({ profileOpen: true })} className="flex items-center gap-2 rounded-full border border-line py-1 pl-1 pr-3 text-xs hover:bg-surface"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-primary to-sky text-[11px] font-bold uppercase text-white">{user.name.slice(0, 1)}</span>{user.name} · en la nube</button>
+          : <div className="flex gap-2"><Button size="sm" variant="ghost" onClick={() => useAuth.getState().set({ dialog: 'login' })} data-testid="login-button">Iniciar sesión</Button><Button size="sm" variant="primary" onClick={() => useAuth.getState().set({ dialog: 'register' })}>Crear cuenta</Button></div>)
+          : <span className="hidden text-xs text-dim sm:block">Modo local · tus proyectos se guardan en este navegador</span>}
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 md:px-8 md:py-12">
         <section className="mb-10 grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-center">

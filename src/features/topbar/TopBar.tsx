@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronLeft, Cloud, CloudOff, Download, HelpCircle, Keyboard, Loader2, Redo2, Settings, Undo2, User, GraduationCap, FolderOpen, Check, AlertCircle } from 'lucide-react';
+import { ChevronLeft, Cloud, CloudOff, Download, HelpCircle, Keyboard, Loader2, Redo2, Settings, Undo2, User, GraduationCap, FolderOpen, Check, AlertCircle, LogIn, LogOut } from 'lucide-react';
 import { APP_NAME } from '@/config/app';
 import { useProject } from '@/state/projectStore';
 import { useUi } from '@/state/uiStore';
@@ -9,6 +9,7 @@ import { NumberField } from '@/components/ui/NumberField';
 import { useMenu } from '@/components/ui/Menu';
 import { closeProject, saveProjectNow } from '@/app/projects';
 import { useIsMobile } from '@/hooks/useMediaQuery';
+import { cloudConfigured, signOut, useAuth } from '@/cloud/auth';
 
 /** Símbolo de marca: una onda de sonido dentro de un círculo; la barra central lo atraviesa. */
 export function BrandMark({ size = 26 }: { size?: number }) {
@@ -69,13 +70,17 @@ export function TopBar() {
   useEffect(() => setDraft(name), [name]);
   const profile = useMenu();
 
+  const user = useAuth((s) => s.user);
+  const sync = useAuth((s) => s.sync);
   const openProfile = (el: HTMLElement) => profile.openFrom(el, [
-    { header: 'Modo local · sin cuenta' },
+    ...(cloudConfigured
+      ? user
+        ? [{ header: user.email }, { label: 'Perfil y nube', icon: <User size={14} />, onSelect: () => useAuth.getState().set({ profileOpen: true }) }, { label: 'Cerrar sesión', icon: <LogOut size={14} />, onSelect: () => void signOut() }, 'separator' as const]
+        : [{ header: 'Sin sesión · proyectos sólo en este navegador' }, { label: 'Iniciar sesión', icon: <LogIn size={14} />, onSelect: () => useAuth.getState().set({ dialog: 'login' }) }, { label: 'Crear cuenta', icon: <User size={14} />, onSelect: () => useAuth.getState().set({ dialog: 'register' }) }, 'separator' as const]
+      : [{ header: 'Modo local · sin cuenta' }]),
     { label: 'Mis proyectos', icon: <FolderOpen size={14} />, onSelect: () => void closeProject() },
     { label: 'Tutorial inicial', icon: <GraduationCap size={14} />, onSelect: () => useSettings.getState().set({ tutorialDone: false }) },
     { label: 'Atajos de teclado', icon: <Keyboard size={14} />, shortcut: '?', onSelect: () => useUi.getState().set({ helpOpen: true }) },
-    'separator',
-    { label: 'Iniciar sesión · disponible en Fase 3', icon: <User size={14} />, disabled: true, onSelect: () => undefined },
   ]);
 
   return (
@@ -118,8 +123,9 @@ export function TopBar() {
         <IconButton label="Ayuda y atajos (?)" onClick={() => useUi.getState().set({ helpOpen: true })}><HelpCircle size={17} /></IconButton>
         <IconButton label="Configuración" onClick={() => useUi.getState().set({ settingsOpen: true })} data-testid="open-settings"><Settings size={17} /></IconButton>
       </>}
-      <button aria-label="Perfil" data-tip="Perfil" onClick={(e) => openProfile(e.currentTarget)} className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-sky text-[12px] font-bold text-white">
-        <User size={15} />
+      <button aria-label="Perfil" data-tip={user ? `${user.name} · ${sync === 'error' ? 'error de sincronización' : sync === 'syncing' ? 'sincronizando…' : 'en la nube'}` : 'Perfil'} onClick={(e) => openProfile(e.currentTarget)} className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-sky text-[12px] font-bold uppercase text-white" data-testid="profile-button">
+        {user ? user.name.slice(0, 1) : <User size={15} />}
+        {user && <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-panel ${sync === 'error' ? 'bg-rec' : sync === 'syncing' ? 'bg-warn' : 'bg-ok'}`} />}
       </button>
       <Button variant="primary" icon={<Download size={15} />} onClick={() => useUi.getState().set({ exportOpen: true })} data-testid="open-export">{isMobile ? '' : 'Exportar'}</Button>
       {profile.element}
