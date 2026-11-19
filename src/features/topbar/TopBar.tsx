@@ -10,14 +10,32 @@ import { useMenu } from '@/components/ui/Menu';
 import { closeProject, saveProjectNow } from '@/app/projects';
 import { useIsMobile } from '@/hooks/useMediaQuery';
 
+/** Símbolo de marca: una onda de sonido dentro de un círculo; la barra central lo atraviesa. */
+export function BrandMark({ size = 26 }: { size?: number }) {
+  const h = [70, 140, 230, 340, 230, 140, 70];
+  return (
+    <svg width={size} height={size} viewBox="0 0 512 512" aria-hidden>
+      <defs>
+        <linearGradient id="bm-ring" gradientUnits="userSpaceOnUse" x1="106" y1="106" x2="406" y2="406"><stop offset="0" stopColor="#8B5CF6" /><stop offset="1" stopColor="#38BDF8" /></linearGradient>
+        <linearGradient id="bm-bar" gradientUnits="userSpaceOnUse" x1="0" y1="100" x2="0" y2="412"><stop offset="0" stopColor="#A78BFA" /><stop offset="1" stopColor="#7C3AED" /></linearGradient>
+      </defs>
+      <rect x="8" y="8" width="496" height="496" rx="116" fill="#141922" stroke="#293241" strokeWidth="8" />
+      <circle cx="256" cy="256" r="150" fill="none" stroke="url(#bm-ring)" strokeWidth="30" />
+      {h.map((v, i) => {
+        const x = 256 + (i - 3) * 40;
+        return i === 3
+          ? <g key={i}><line x1={x} y1={256 - v / 2} x2={x} y2={256 + v / 2} stroke="#141922" strokeWidth="40" strokeLinecap="round" /><line x1={x} y1={256 - v / 2} x2={x} y2={256 + v / 2} stroke="#38BDF8" strokeWidth="24" strokeLinecap="round" /></g>
+          : <line key={i} x1={x} y1={256 - v / 2} x2={x} y2={256 + v / 2} stroke="url(#bm-bar)" strokeWidth="24" strokeLinecap="round" />;
+      })}
+    </svg>
+  );
+}
+
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2" aria-label={APP_NAME}>
-      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden>
-        <rect width="32" height="32" rx="8" fill="#1C2330" />
-        <g fill="#8B5CF6"><rect x="6" y="13" width="3" height="6" rx="1.5" /><rect x="11" y="9" width="3" height="14" rx="1.5" /><rect x="16" y="6" width="3" height="20" rx="1.5" fill="#38BDF8" /><rect x="21" y="11" width="3" height="10" rx="1.5" /></g>
-      </svg>
-      {!compact && <span className="text-[13px] font-bold tracking-[0.14em]">{APP_NAME}</span>}
+      <BrandMark size={28} />
+      {!compact && <span className="text-[14px] font-bold tracking-[0.02em]">{APP_NAME}</span>}
     </div>
   );
 }

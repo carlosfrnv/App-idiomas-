@@ -1,5 +1,5 @@
 /** Configuración global de marca. El nombre es configurable vía VITE_APP_NAME. */
-export const APP_NAME: string = (import.meta.env.VITE_APP_NAME as string | undefined)?.trim() || 'SONORA STUDIO';
+export const APP_NAME: string = (import.meta.env.VITE_APP_NAME as string | undefined)?.trim() || 'estudivo.com';
 
 /** Límites de importación (validación de archivos). */
 export const IMPORT_LIMITS = {

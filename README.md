@@ -1,9 +1,9 @@
-# SONORA STUDIO
+# estudivo.com
 
 Estación de trabajo de audio digital (DAW) en el navegador: importa una instrumental, graba tu
 voz, edita las tomas, mezcla con EQ, compresión y efectos, y exporta tu canción en WAV.
 
-> El nombre es configurable: `VITE_APP_NAME="Mi Estudio"` en `.env.local`.
+> Nombre provisional anterior: SONORA STUDIO. El nombre es configurable con `VITE_APP_NAME` en `.env.local`.
 
 ## Requisitos
 - Node.js ≥ 20 y npm
