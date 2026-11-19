@@ -1,0 +1,16 @@
+// Tipos mínimos del ámbito AudioWorkletGlobalScope.
+declare const sampleRate: number;
+declare const currentFrame: number;
+declare const currentTime: number;
+declare class AudioWorkletProcessor {
+  readonly port: MessagePort;
+  constructor(options?: unknown);
+}
+declare function registerProcessor(name: string, ctor: new (options?: any) => AudioWorkletProcessor): void;
+interface AudioParamDescriptor {
+  name: string;
+  defaultValue?: number;
+  minValue?: number;
+  maxValue?: number;
+  automationRate?: 'a-rate' | 'k-rate';
+}
