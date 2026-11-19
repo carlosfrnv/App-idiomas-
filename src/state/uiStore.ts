@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type BottomPanel = 'fx' | 'mixer' | 'clip' | null;
+export type BottomPanel = 'fx' | 'mixer' | 'clip' | 'lyrics' | null;
 export type LibraryTab = 'files' | 'beats' | 'recordings' | 'tracks' | 'effects' | 'presets' | 'projects' | 'sounds';
 
 export interface UiState {

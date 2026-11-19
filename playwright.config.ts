@@ -24,10 +24,15 @@ export default defineConfig({
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
   ],
-  webServer: {
-    command: `npx vite --port ${PORT} --strictPort`,
-    url: `http://localhost:${PORT}`,
-    reuseExistingServer: true,
-    timeout: 60_000,
-  },
+  webServer: [
+    // proveedor de IA simulado (API compatible con Groq) para probar el asistente de letras
+    { command: 'node e2e/fixtures/mockGroq.mjs', port: 5199, reuseExistingServer: true },
+    {
+      command: `npx vite --port ${PORT} --strictPort`,
+      url: `http://localhost:${PORT}`,
+      reuseExistingServer: true,
+      timeout: 60_000,
+      env: { GROQ_API_KEY: 'test-key', GROQ_BASE_URL: 'http://localhost:5199/openai/v1', GEMINI_API_KEY: '' },
+    },
+  ],
 });

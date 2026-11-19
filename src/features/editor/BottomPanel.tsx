@@ -1,4 +1,5 @@
-import { ChevronDown, ChevronUp, SlidersHorizontal, SlidersVertical, AudioLines } from 'lucide-react';
+import { ChevronDown, ChevronUp, SlidersHorizontal, SlidersVertical, AudioLines, PenLine } from 'lucide-react';
+import { LyricsPanel } from '@/features/lyrics/LyricsPanel';
 import { useUi, type BottomPanel as Panel } from '@/state/uiStore';
 import { Mixer } from '@/features/mixer/Mixer';
 import { FxPanel } from '@/features/fx/FxPanel';
@@ -9,6 +10,7 @@ const TABS: { id: Exclude<Panel, null>; label: string; icon: React.ReactNode; ke
   { id: 'mixer', label: 'Mezclador', icon: <SlidersVertical size={14} />, key: 'M' },
   { id: 'fx', label: 'Efectos', icon: <SlidersHorizontal size={14} />, key: 'E' },
   { id: 'clip', label: 'Clip', icon: <AudioLines size={14} />, key: '' },
+  { id: 'lyrics', label: 'Letras', icon: <PenLine size={14} />, key: '' },
 ];
 
 export function BottomPanel() {
@@ -45,6 +47,7 @@ export function BottomPanel() {
           {panel === 'mixer' && <Mixer />}
           {panel === 'fx' && <FxPanel />}
           {panel === 'clip' && <ClipInspector />}
+          {panel === 'lyrics' && <LyricsPanel />}
         </div>
       )}
     </div>

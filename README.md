@@ -37,6 +37,19 @@ Si Playwright no encuentra el navegador, instala uno con `npx playwright install
 
 Atajos: `Espacio` reproducir · `R` grabar · `S` dividir · `Ctrl+Z/Ctrl+Shift+Z` · `Ctrl+D` · `Supr` · `Ctrl+S` · `?` ayuda.
 
+## Asistente de letras con IA (gratis)
+
+El panel **Letras** incluye un editor con contador de sílabas y detector de rimas (funciona sin IA)
+y un asistente que escribe versos, estribillos, continúa tu letra, mejora fragmentos, busca rimas y propone ideas.
+
+1. Crea una clave gratuita en **Groq** (https://console.groq.com/keys) y/o **Google Gemini** (https://aistudio.google.com/apikey).
+2. Copia `.env.example` a `.env.local` y rellena `GROQ_API_KEY` y/o `GEMINI_API_KEY` (sin prefijo `VITE_`).
+3. Reinicia `npm run dev`. Si tienes las dos, se usa Groq y, si agota su límite gratuito, Gemini.
+
+Las claves sólo las lee el servidor (`server/lyricsAi.ts`, expuesto en `/api/lyrics`); nunca llegan al navegador.
+Para publicar la web, despliega en un hosting con funciones (p. ej. Vercel: `api/lyrics.ts`) y define allí las mismas variables.
+Si un modelo se retira, cambia `GROQ_MODEL` / `GEMINI_MODEL`.
+
 ## Documentación
 - [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) — arquitectura, limitaciones del navegador, fases
 - [PROGRESS.md](PROGRESS.md) — estado, pruebas, limitaciones y próximos pasos

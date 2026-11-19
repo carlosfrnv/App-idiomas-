@@ -8,6 +8,7 @@
 | 2 — Edición y mezcla | ✅ **Completada y verificada** (E2E con análisis numérico del audio exportado) |
 | 3 — Plataforma online | 🟡 Preparada (esquema SQL + RLS + interfaz de repositorio). **Bloqueada: requiere proyecto Supabase del usuario** |
 | 4 — Producción avanzada | ⏳ Pendiente (corrección de tono planificada, no expuesta como funcional) |
+| Extra — Asistente de letras IA | ✅ Completado (Groq/Gemini vía servidor, sílabas y rimas offline). Requiere claves gratuitas del usuario para generar texto |
 | 5 — Producto comercial | 🟡 Modelo de planes/límites preparado (`src/config/plans.ts`, desactivado) |
 
 ## Fase 1 — tareas
@@ -42,6 +43,15 @@
   - `phase2-editing.spec.ts` — dividir/mover/recortar/duplicar/eliminar + deshacer/rehacer; pistas
   - `phase2-effects.spec.ts` — EQ (medido vs. curva: error < 0,3 dB), compresor y makeup, reverb, delay, filtro, saturación, preset; pan, ganancia de clip, master, fundidos
   - `robustness.spec.ts` — permiso denegado, archivo inválido, bucle, noise gate, persistencia de efectos
+
+## Asistente de letras (añadido)
+- [x] Editor de letra guardado en el proyecto (deshacer/rehacer, autoguardado), etiquetas de sección
+- [x] Sílabas por línea con sinalefa y rimas consonantes/asonantes coloreadas (sin IA, `src/lib/spanishMeter.ts`)
+- [x] IA: verso, estribillo, continuar, mejorar selección, rimas, ideas; género, ánimo y variante de español
+- [x] Servidor `/api/lyrics` (Groq compatible OpenAI + Gemini `generateContent`), respaldo automático entre proveedores,
+      validación y límites de tamaño, limitador por IP, errores comprensibles (límite gratuito, clave, modelo retirado)
+- [x] Pruebas: 27 unitarias (servidor + métrica) y E2E completo contra un proveedor simulado; se verifica que la clave nunca pasa por el navegador
+- Pendiente de verificación con claves reales (no disponibles en este entorno; los nombres de modelo por defecto son configurables)
 
 ## Defectos encontrados y corregidos durante la verificación
 1. Q de pasa-altos/bajos interpretado en dB por Web Audio → conversión explícita (`qForNode`).

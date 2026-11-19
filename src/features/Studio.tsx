@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { ChevronRight, Upload } from 'lucide-react';
+import { ChevronRight, PenLine, Upload } from 'lucide-react';
 import { TopBar } from './topbar/TopBar';
 import { TransportBar } from './transport/TransportBar';
 import { LibraryPanel } from './library/LibraryPanel';
@@ -21,6 +21,7 @@ import { IconButton, Button } from '@/components/ui/Button';
 export function Studio() {
   useShortcuts();
   const libraryOpen = useUi((s) => s.libraryOpen);
+  const bottomPanel = useUi((s) => s.bottomPanel);
   const isMobile = useIsMobile();
   const isTablet = useIsTablet();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -42,11 +43,11 @@ export function Studio() {
         ))}
         <div className="flex min-w-0 flex-1 flex-col">
           <Timeline onImportClick={openImport} />
-          {!isMobile && <BottomPanel />}
+          {(!isMobile || bottomPanel === 'lyrics') && <BottomPanel />}
           {isMobile && (
             <div className="flex shrink-0 items-center gap-2 border-t border-line bg-panel p-2 pb-[max(8px,env(safe-area-inset-bottom))]">
-              <Button size="lg" icon={<Upload size={16} />} onClick={openImport} className="flex-1">Importar audio</Button>
-              <span className="text-[11px] text-dim">Vista simplificada · usa un ordenador para mezclar</span>
+              <Button size="lg" icon={<Upload size={16} />} onClick={openImport} className="flex-1">Importar</Button>
+              <Button size="lg" variant={bottomPanel === 'lyrics' ? 'primary' : 'subtle'} icon={<PenLine size={16} />} onClick={() => useUi.getState().set({ bottomPanel: bottomPanel === 'lyrics' ? null : 'lyrics', bottomHeight: Math.round(window.innerHeight * 0.6) })} className="flex-1" data-testid="mobile-lyrics">Letras</Button>
             </div>
           )}
         </div>

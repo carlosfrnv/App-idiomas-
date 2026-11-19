@@ -21,7 +21,12 @@ export function emptyDoc(): ProjectDoc {
     loop: { enabled: false, start: 0, end: 8 },
     masterVolume: 1,
     masterEffects: [],
+    lyrics: emptyLyrics(),
   };
+}
+
+export function emptyLyrics(): import('@/types/project').LyricsDoc {
+  return { text: '', theme: '', genre: 'Trap', mood: 'Melancólico', dialect: 'neutro' };
 }
 
 export function makeTrack(doc: ProjectDoc, partial: Partial<Track> = {}): Track {

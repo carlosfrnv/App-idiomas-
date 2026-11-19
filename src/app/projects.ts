@@ -33,7 +33,7 @@ export async function openProject(id: string): Promise<boolean> {
 }
 
 function migrateDoc(doc: ProjectDoc): ProjectDoc {
-  return { ...emptyDoc(), ...doc, loop: doc.loop ?? emptyDoc().loop, masterEffects: doc.masterEffects ?? [] };
+  return { ...emptyDoc(), ...doc, loop: doc.loop ?? emptyDoc().loop, masterEffects: doc.masterEffects ?? [], lyrics: { ...emptyDoc().lyrics!, ...(doc.lyrics ?? {}) } };
 }
 
 export async function createProject(name = 'Proyecto sin título', opts: { demo?: DemoStyle } = {}): Promise<string> {

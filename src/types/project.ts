@@ -45,6 +45,14 @@ export interface LoopRegion {
   end: number;
 }
 
+export interface LyricsDoc {
+  text: string;
+  theme: string;
+  genre: string;
+  mood: string;
+  dialect: 'neutro' | 'espana' | 'latino';
+}
+
 export interface ProjectDoc {
   version: 1;
   bpm: number;
@@ -55,6 +63,8 @@ export interface ProjectDoc {
   loop: LoopRegion;
   masterVolume: number;
   masterEffects: EffectSlot[];
+  /** Letra de la canción y preferencias del asistente (opcional en proyectos antiguos). */
+  lyrics?: LyricsDoc;
 }
 
 export interface ProjectMeta {
