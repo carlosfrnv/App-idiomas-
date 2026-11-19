@@ -47,6 +47,7 @@ export async function renderMix(doc: ProjectDoc, buffers: Map<string, AudioBuffe
     ch.update(t, isTrackAudible(doc, t), fx, true);
     channels.set(t.id, ch);
   }
+  for (const t of doc.tracks) channels.get(t.id)!.scheduleAutomation(t, start, 0, end + tail, true);
   scheduleClips(ctx, doc.clips, (id) => buffers.get(id), (id) => channels.get(id)?.input, start, 0, end);
 
   // Progreso real: suspensiones periódicas del contexto offline.

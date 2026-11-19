@@ -22,6 +22,10 @@ export interface Clip {
   recorded?: boolean;
 }
 
+export interface AutomationPoint { t: number; v: number }
+export interface AutomationLane { enabled: boolean; points: AutomationPoint[] }
+export type AutomationParam = 'volume' | 'pan';
+
 export interface Track {
   id: string;
   name: string;
@@ -37,6 +41,10 @@ export interface Track {
   armed: boolean;
   height: number;
   effects: EffectSlot[];
+  /** Automatización de parámetros (volumen como ganancia lineal, pan -1..1). */
+  automation?: Partial<Record<AutomationParam, AutomationLane>>;
+  /** Carril de automatización visible en el editor (estado de vista guardado con el proyecto). */
+  automationView?: AutomationParam | null;
 }
 
 export interface LoopRegion {

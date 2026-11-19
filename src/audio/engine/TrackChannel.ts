@@ -1,6 +1,7 @@
 import type { Track } from '@/types/project';
 import type { FxContext } from '@/audio/fx/processors';
 import { FxChain } from './FxChain';
+import { activeLane, scheduleLane, valueAt } from './automation';
 
 /**
  * Tira de canal: input → FX → volumen → pan → mute/solo → salida.
@@ -29,10 +30,31 @@ export class TrackChannel {
     const t = this.ctx.currentTime;
     const smooth = !immediate && this.ctx instanceof AudioContext;
     const setp = (p: AudioParam, v: number) => (smooth ? p.setTargetAtTime(v, t, 0.012) : (p.value = v));
-    setp(this.volume.gain, track.volume);
-    setp(this.panner.pan, Math.max(-1, Math.min(1, track.pan)));
+    // con automatización activa, el parámetro lo gobierna la curva (modo "lectura")
+    if (!activeLane(track, 'volume')) setp(this.volume.gain, track.volume);
+    if (!activeLane(track, 'pan')) setp(this.panner.pan, Math.max(-1, Math.min(1, track.pan)));
     setp(this.audible.gain, audible ? 1 : 0);
     this.fx.update(track.effects, fx);
+  }
+
+  /** Programa la automatización para un tramo de reproducción. `reset` borra lo programado antes. */
+  scheduleAutomation(track: Track, segPos: number, segCtx: number, segEnd: number, reset: boolean) {
+    for (const [param, node] of [['volume', this.volume.gain], ['pan', this.panner.pan]] as const) {
+      const lane = activeLane(track, param);
+      if (!lane) continue;
+      if (reset) node.cancelScheduledValues(0);
+      scheduleLane(node, lane.points, segPos, segCtx, segEnd);
+    }
+  }
+
+  /** Valor estático de la automatización en una posición (transporte parado). */
+  holdAutomation(track: Track, pos: number) {
+    for (const [param, node] of [['volume', this.volume.gain], ['pan', this.panner.pan]] as const) {
+      const lane = activeLane(track, param);
+      if (!lane) continue;
+      node.cancelScheduledValues(0);
+      node.value = valueAt(lane.points, pos);
+    }
   }
 
   dispose() {

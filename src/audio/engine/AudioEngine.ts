@@ -123,8 +123,11 @@ export class AudioEngine {
       this.master.update(doc.masterVolume, doc.masterEffects, fx);
     }
     // si cambian clips o bucle mientras suena, reprogramar desde la posición actual
-    if (this._playing && prev && (prev.clips !== doc.clips || prev.loop !== doc.loop || prev.tracks.length !== doc.tracks.length)) {
+    const autoChanged = !!prev && doc.tracks.some((t) => prev.tracks.find((x) => x.id === t.id)?.automation !== t.automation);
+    if (this._playing && prev && (prev.clips !== doc.clips || prev.loop !== doc.loop || prev.tracks.length !== doc.tracks.length || autoChanged)) {
       this.restartFrom(this.getPosition());
+    } else if (!this._playing) {
+      this.holdAutomation(this.stoppedPos);
     }
   }
 
@@ -191,7 +194,7 @@ export class AudioEngine {
     this._playing = true;
     this.segments = [];
     const endPos = this.loopActive() ? loop.end : Number.POSITIVE_INFINITY;
-    this.scheduleSegment(startPos, t0, endPos);
+    this.scheduleSegment(startPos, t0, endPos, true);
     this.nextLoopCtx = this.loopActive() ? t0 + (loop.end - startPos) : 0;
     this.metroNextBeatCtx = 0;
     if (!this.schedulerId) this.schedulerId = setInterval(() => this.tick(), TICK_MS);
@@ -203,8 +206,14 @@ export class AudioEngine {
     this.startAt(pos);
   }
 
-  private scheduleSegment(pos: number, ctxTime: number, endPos: number) {
+  private holdAutomation(pos: number) {
+    if (!this.doc) return;
+    for (const t of this.doc.tracks) this.channels.get(t.id)?.ch.holdAutomation(t, pos);
+  }
+
+  private scheduleSegment(pos: number, ctxTime: number, endPos: number, reset = false) {
     const doc = this.doc!;
+    for (const t of doc.tracks) this.channels.get(t.id)?.ch.scheduleAutomation(t, pos, ctxTime, endPos, reset);
     this.segments.push({ ctxTime, pos, endPos });
     if (this.segments.length > 4) this.segments.shift();
     const srcs = scheduleClips(
@@ -289,17 +298,19 @@ export class AudioEngine {
     this.stopSources();
     this.segments = [];
     if (this.schedulerId) { clearInterval(this.schedulerId); this.schedulerId = null; }
+    this.holdAutomation(this.stoppedPos);
   }
 
   stop(rewindTo = 0) {
     this.pause();
     this.stoppedPos = rewindTo;
+    this.holdAutomation(rewindTo);
   }
 
   seek(pos: number) {
     const p = Math.max(0, pos);
     if (this._playing) this.startAt(p);
-    else this.stoppedPos = p;
+    else { this.stoppedPos = p; this.holdAutomation(p); }
   }
 
   private stopSources() {

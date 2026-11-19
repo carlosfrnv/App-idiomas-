@@ -99,6 +99,17 @@ function TrackHeaderImpl({ track, index, height, selected, compact, onReorderSta
             useProject.getState().apply((d) => ({ ...d, tracks: doc.tracks.map((t) => ({ ...t, armed: t.id === track.id ? !track.armed : false })) }));
           }} disabled={track.locked} />
           {!compact && (
+            <button
+              aria-label="Mostrar automatización"
+              aria-pressed={!!track.automationView}
+              data-tip="Automatización (volumen / panorama)"
+              data-testid="toggle-automation"
+              onClick={() => useProject.getState().apply((d) => ({ ...d, tracks: d.tracks.map((t) => (t.id === track.id ? { ...t, automationView: t.automationView ? null : 'volume' } : t)) }), { history: false })}
+              onPointerDown={(e) => e.stopPropagation()}
+              className={`flex h-6 w-6 items-center justify-center rounded text-[11px] font-bold ${track.automationView ? 'bg-ok text-bg' : (track.automation?.volume?.enabled || track.automation?.pan?.enabled) ? 'bg-surface text-ok shadow-[inset_0_0_0_1px_#22C55E]' : 'bg-surface text-muted shadow-[inset_0_0_0_1px_#293241]'}`}
+            >A</button>
+          )}
+          {!compact && (
             <button aria-label={track.locked ? 'Desbloquear pista' : 'Bloquear pista'} aria-pressed={track.locked} data-tip={track.locked ? 'Desbloquear' : 'Bloquear edición'} onClick={() => set({ locked: !track.locked })} onPointerDown={(e) => e.stopPropagation()} className={`flex h-6 w-6 items-center justify-center rounded ${track.locked ? 'bg-muted text-bg' : 'bg-surface text-muted shadow-[inset_0_0_0_1px_#293241]'}`}>
               {track.locked ? <Lock size={11} /> : <LockOpen size={11} />}
             </button>

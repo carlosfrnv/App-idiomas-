@@ -12,6 +12,7 @@ import { IconButton, Button } from '@/components/ui/Button';
 import { useIsMobile } from '@/hooks/useMediaQuery';
 import { TimelineCtx, type TimelineApi, RULER_H, HEADER_W, HEADER_W_MOBILE, ASSET_MIME } from './TimelineContext';
 import { TrackHeader } from './TrackHeader';
+import { AutomationHeader, AutomationLaneView, AUTO_H } from './AutomationLane';
 import { ClipView } from './ClipView';
 import { Ruler } from './Ruler';
 import { Playhead } from './Playhead';
@@ -40,7 +41,9 @@ export function Timeline({ onImportClick }: { onImportClick: () => void }) {
     return () => ro.disconnect();
   }, []);
 
-  const rowHeights = useMemo(() => tracks.map((t) => Math.round(t.height * heightScale)), [tracks, heightScale]);
+  const trackHeights = useMemo(() => tracks.map((t) => Math.round(t.height * heightScale)), [tracks, heightScale]);
+  // altura total por pista (incluye su carril de automatización si está abierto) para hit-testing
+  const rowHeights = useMemo(() => tracks.map((t, i) => trackHeights[i] + (t.automationView ? AUTO_H : 0)), [tracks, trackHeights]);
 
   const api: TimelineApi = useMemo(() => ({
     timeAtClientX: (x) => {
@@ -198,7 +201,10 @@ export function Timeline({ onImportClick }: { onImportClick: () => void }) {
           <div className="flex min-h-full">
             <div className="sticky left-0 z-20 shrink-0 border-r border-line bg-panel" style={{ width: headerW }}>
               {tracks.map((t, i) => (
-                <TrackHeader key={t.id} track={t} index={i} height={rowHeights[i]} selected={t.id === selectedTrackId} compact={isMobile} onReorderStart={onReorderStart} />
+                <div key={t.id}>
+                  <TrackHeader track={t} index={i} height={trackHeights[i]} selected={t.id === selectedTrackId} compact={isMobile} onReorderStart={onReorderStart} />
+                  {t.automationView && <AutomationHeader track={t} height={AUTO_H} />}
+                </div>
               ))}
               {tracks.length > 0 && (
                 <button onClick={() => addEmptyTrack()} className="flex h-10 w-full items-center gap-2 px-3 text-xs text-dim hover:bg-surface hover:text-fg"><Plus size={14} /> Nueva pista</button>
@@ -206,10 +212,13 @@ export function Timeline({ onImportClick }: { onImportClick: () => void }) {
             </div>
             <div ref={lanesRef} className="relative min-w-0 flex-1 overflow-hidden" style={gridBg} onPointerDown={onLanePointerDown} data-testid="lanes">
               {tracks.map((t, i) => (
-                <div key={t.id} data-testid="lane" data-track-id={t.id} className={`relative border-b border-line-soft ${t.id === selectedTrackId ? 'bg-white/[0.018]' : ''} ${dropHint === t.id ? 'bg-primary/10' : ''} ${t.mute || (tracks.some((x) => x.solo) && !t.solo) ? 'opacity-45' : ''}`} style={{ height: rowHeights[i] }}>
+                <div key={t.id}>
+                <div data-testid="lane" data-track-id={t.id} className={`relative border-b border-line-soft ${t.id === selectedTrackId ? 'bg-white/[0.018]' : ''} ${dropHint === t.id ? 'bg-primary/10' : ''} ${t.mute || (tracks.some((x) => x.solo) && !t.solo) ? 'opacity-45' : ''}`} style={{ height: trackHeights[i] }}>
                   {(clipsByTrack.get(t.id) ?? []).map((c) => (
-                    <ClipView key={c.id} clip={c} track={t} height={rowHeights[i]} pxPerSec={pxPerSec} scrollTime={scrollTime} viewportWidth={viewportWidth} selected={selectedSet.has(c.id)} />
+                    <ClipView key={c.id} clip={c} track={t} height={trackHeights[i]} pxPerSec={pxPerSec} scrollTime={scrollTime} viewportWidth={viewportWidth} selected={selectedSet.has(c.id)} />
                   ))}
+                </div>
+                {t.automationView && <AutomationLaneView track={t} height={AUTO_H} pxPerSec={pxPerSec} scrollTime={scrollTime} viewportWidth={viewportWidth} />}
                 </div>
               ))}
               {dropHint === 'new' && <div className="flex h-16 items-center justify-center border-2 border-dashed border-primary/50 bg-primary/5 text-xs text-primary">Suelta para crear una pista nueva</div>}
