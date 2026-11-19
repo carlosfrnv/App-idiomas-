@@ -7,6 +7,7 @@ import { formatClock } from '@/lib/time';
 import { Button } from '@/components/ui/Button';
 import { deleteSelection, duplicateSelection, splitAtPlayhead } from '@/app/editing';
 import { Copy, Scissors, Trash2 } from 'lucide-react';
+import { PitchSection } from './PitchSection';
 
 export function ClipInspector() {
   const ids = useUi((s) => s.selectedClipIds);
@@ -34,6 +35,7 @@ export function ClipInspector() {
       <Knob label="Ganancia" size={52} value={Math.max(-36, isFinite(db) ? db : -36)} min={-36} max={12} defaultValue={0} disabled={locked} format={(v) => `${v > 0 ? '+' : ''}${v.toFixed(1)} dB`} onChange={(v) => set({ gain: v <= -36 ? 0 : dbToGain(v) }, 'gain')} />
       <Knob label="Fade in" size={52} value={clip.fadeIn} min={0} max={Math.max(0.01, clip.duration)} defaultValue={0} disabled={locked} format={(v) => `${v.toFixed(2)} s`} onChange={(v) => set({ fadeIn: v }, 'fi')} color="#38BDF8" />
       <Knob label="Fade out" size={52} value={clip.fadeOut} min={0} max={Math.max(0.01, clip.duration)} defaultValue={0} disabled={locked} format={(v) => `${v.toFixed(2)} s`} onChange={(v) => set({ fadeOut: v }, 'fo')} color="#38BDF8" />
+      <PitchSection clip={clip} locked={locked} />
     </div>
   );
 }

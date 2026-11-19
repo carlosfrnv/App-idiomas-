@@ -178,7 +178,7 @@ function EffectsTab() {
           <SlidersHorizontal size={13} className="text-primary" />{EFFECT_LABELS[t]}
         </button>
       ))}
-      <div className="mt-2 rounded-md border border-dashed border-line px-2 py-1.5 text-[11px] text-dim">Corrección de tono — en desarrollo (Fase 4)</div>
+      <div className="mt-2 rounded-md border border-dashed border-line px-2 py-1.5 text-[11px] text-dim">Corrección de tono: selecciona un clip de voz → pestaña Clip.</div>
     </div>
   );
 }

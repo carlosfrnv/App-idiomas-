@@ -100,7 +100,7 @@ export function FxPanel() {
           </ol>
           <div className="mt-3 rounded-md border border-dashed border-line p-2.5" data-testid="pitch-roadmap">
             <div className="flex items-center gap-1.5 text-[12px] font-semibold text-muted"><Power size={12} /> Corrección de tono</div>
-            <p className="mt-1 text-[11px] leading-snug text-dim">En desarrollo (Fase 4): detección de F0 + desplazamiento de tono con preservación de formantes. No disponible todavía.</p>
+            <p className="mt-1 text-[11px] leading-snug text-dim">Selecciona un clip de voz y abre la pestaña <button className="text-primary underline" onClick={() => useUi.getState().set({ bottomPanel: 'clip' })}>Clip</button> para afinarlo (natural o robótico).</p>
           </div>
         </div>
       </aside>

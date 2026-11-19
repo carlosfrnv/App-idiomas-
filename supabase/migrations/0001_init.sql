@@ -55,7 +55,7 @@ create table if not exists public.assets (
   duration real not null,
   sample_rate integer not null,
   channels smallint not null,
-  kind text not null check (kind in ('import','recording','demo')),
+  kind text not null check (kind in ('import','recording','demo','processed')),
   storage_path text not null unique,            -- <owner_id>/<asset_id>.<ext> en el bucket 'audio'
   created_at timestamptz not null default now()
 );

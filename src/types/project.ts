@@ -20,6 +20,8 @@ export interface Clip {
   fadeOut: number;
   /** Si el clip proviene de una grabación. */
   recorded?: boolean;
+  /** Corrección de tono aplicada (no destructiva: se conserva el audio original). */
+  pitch?: { sourceAssetId: string; key: number; scale: string; strength: number; speedMs: number };
 }
 
 export interface AutomationPoint { t: number; v: number }
@@ -98,7 +100,7 @@ export interface AudioAsset {
   sampleRate: number;
   channels: number;
   createdAt: number;
-  kind: 'import' | 'recording' | 'demo';
+  kind: 'import' | 'recording' | 'demo' | 'processed';
 }
 
 export interface StoredAsset extends AudioAsset {
