@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import '@fontsource-variable/inter';
-import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/archivo/standard.css';
+import '@fontsource-variable/martian-mono/standard.css';
 import './styles/index.css';
 import { App } from './App';
 import { engine } from '@/audio/engine/AudioEngine';

@@ -55,7 +55,7 @@ export function EqEditor({ target, slot }: { target: FxTarget; slot: EffectSlotO
     const g = c.getContext('2d')!;
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
     g.clearRect(0, 0, w, h);
-    g.font = '10px "JetBrains Mono Variable", monospace';
+    g.font = '9px "Martian Mono Variable", monospace';
     for (const f of [50, 100, 200, 500, 1000, 2000, 5000, 10000]) {
       const x = Math.round(fx(f, w)) + 0.5;
       g.fillStyle = '#1F2733'; g.fillRect(x, 0, 1, h);

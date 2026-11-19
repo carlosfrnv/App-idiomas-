@@ -18,7 +18,7 @@ El nombre del producto es configurable con `VITE_APP_NAME` (ver `src/config/app.
 | Estilos | **Tailwind CSS 4** con tokens de diseño en `@theme` | Paleta definida una vez (`src/styles/index.css`). |
 | Estado | **Zustand** | Store fuera de React: el motor de audio se suscribe sin re-render. |
 | Iconos | `lucide-react` (ISC) | Licencia permisiva, iconos originales (no propietarios de otros DAW). |
-| Fuentes | Inter / JetBrains Mono (OFL) | Autoalojadas con `@fontsource`. |
+| Fuentes | Archivo / Martian Mono (OFL) | Autoalojadas con `@fontsource`. |
 | Persistencia local | **IndexedDB** (wrapper propio, sin dependencias) | Guarda **los Blobs de audio reales**, no `blob:` URLs. |
 | Audio | **Web Audio API**, **AudioWorklet** (grabación, medición), **OfflineAudioContext** (exportación) | Nativo, sin licencias. |
 | Pruebas | **Vitest** (unidad) + **Playwright** (E2E en Chromium real con micrófono falso) | |

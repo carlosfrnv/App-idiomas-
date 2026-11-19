@@ -41,7 +41,7 @@ export function Ruler() {
     while (barPx * every < 44) every *= 2;
     const first = Math.floor(scrollTime / barS);
     const last = Math.ceil((scrollTime + W / pxPerSec) / barS);
-    g.font = '500 10px "JetBrains Mono Variable", ui-monospace, monospace';
+    g.font = '500 9px "Martian Mono Variable", ui-monospace, monospace';
     g.textBaseline = 'middle';
     for (let b = Math.max(0, first); b <= last; b++) {
       const x = Math.round((b * barS - scrollTime) * pxPerSec) + 0.5;

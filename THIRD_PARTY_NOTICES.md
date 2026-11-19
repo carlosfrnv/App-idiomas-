@@ -5,7 +5,7 @@
 | React, React DOM | MIT | Interfaz |
 | Zustand | MIT | Estado |
 | lucide-react | ISC | Iconos |
-| Inter, JetBrains Mono (@fontsource) | SIL OFL 1.1 | Tipografías |
+| Archivo, Martian Mono (@fontsource) | SIL OFL 1.1 | Tipografías |
 | @supabase/supabase-js | MIT | Cuentas y nube (opcional) |
 | **@breezystack/lamejs** (port de LAME) | **LGPL-3.0** | Codificación MP3 |
 

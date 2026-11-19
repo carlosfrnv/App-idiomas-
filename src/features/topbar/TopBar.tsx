@@ -36,7 +36,11 @@ export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-2" aria-label={APP_NAME}>
       <BrandMark size={28} />
-      {!compact && <span className="text-[14px] font-bold tracking-[0.02em]">{APP_NAME}</span>}
+      {!compact && (
+        <span className="text-[15px] font-extrabold tracking-[-0.01em] [font-stretch:125%]">
+          {APP_NAME.replace(/\.com$/, '')}<span className="text-primary">{APP_NAME.endsWith('.com') ? '.com' : ''}</span>
+        </span>
+      )}
     </div>
   );
 }
@@ -84,7 +88,7 @@ export function TopBar() {
   ]);
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-line bg-panel px-2 md:gap-3 md:px-3">
+    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-[#0B0E14] bg-panel px-2 shadow-[inset_0_-1px_0_rgb(255_255_255/0.03)] md:gap-3 md:px-3">
       <IconButton label="Volver a mis proyectos" onClick={() => void closeProject()} data-testid="back-projects"><ChevronLeft size={18} /></IconButton>
       <Logo compact={isMobile} />
       <div className="mx-1 hidden h-5 w-px bg-line md:block" />
@@ -95,7 +99,7 @@ export function TopBar() {
         onChange={(e) => setDraft(e.target.value)}
         onBlur={() => { const v = draft.trim() || 'Proyecto sin título'; setDraft(v); if (v !== name) useProject.getState().rename(v.slice(0, 80)); }}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === 'Escape') { if (e.key === 'Escape') setDraft(name); (e.target as HTMLInputElement).blur(); } }}
-        className="h-8 min-w-0 max-w-[260px] flex-1 truncate rounded-md border border-transparent bg-transparent px-2 text-[14px] font-semibold outline-none hover:border-line focus:border-primary focus:bg-bg"
+        className="h-8 min-w-0 max-w-[280px] flex-1 truncate rounded-sm border border-transparent bg-transparent px-2 text-[14px] font-semibold [font-stretch:112%] outline-none hover:border-line focus:border-primary focus:bg-bg"
       />
       <SaveStatus />
       <div className="flex-1" />
@@ -123,7 +127,7 @@ export function TopBar() {
         <IconButton label="Ayuda y atajos (?)" onClick={() => useUi.getState().set({ helpOpen: true })}><HelpCircle size={17} /></IconButton>
         <IconButton label="Configuración" onClick={() => useUi.getState().set({ settingsOpen: true })} data-testid="open-settings"><Settings size={17} /></IconButton>
       </>}
-      <button aria-label="Perfil" data-tip={user ? `${user.name} · ${sync === 'error' ? 'error de sincronización' : sync === 'syncing' ? 'sincronizando…' : 'en la nube'}` : 'Perfil'} onClick={(e) => openProfile(e.currentTarget)} className="relative flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-sky text-[12px] font-bold uppercase text-white" data-testid="profile-button">
+      <button aria-label="Perfil" data-tip={user ? `${user.name} · ${sync === 'error' ? 'error de sincronización' : sync === 'syncing' ? 'sincronizando…' : 'en la nube'}` : 'Perfil'} onClick={(e) => openProfile(e.currentTarget)} className="relative flex h-8 w-8 items-center justify-center rounded-sm border border-[#0B0E14] bg-gradient-to-br from-primary to-sky text-[12px] font-extrabold uppercase text-white [font-stretch:125%]" data-testid="profile-button">
         {user ? user.name.slice(0, 1) : <User size={15} />}
         {user && <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-panel ${sync === 'error' ? 'bg-rec' : sync === 'syncing' ? 'bg-warn' : 'bg-ok'}`} />}
       </button>

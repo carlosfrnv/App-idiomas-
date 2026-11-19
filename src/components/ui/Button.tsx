@@ -2,11 +2,11 @@ import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 
 type Variant = 'primary' | 'ghost' | 'subtle' | 'danger' | 'outline';
 const variants: Record<Variant, string> = {
-  primary: 'bg-primary text-white hover:bg-primary-strong shadow-[0_1px_0_0_rgb(255_255_255/0.15)_inset]',
-  ghost: 'text-muted hover:text-fg hover:bg-surface',
-  subtle: 'bg-surface text-fg hover:bg-surface-2 border border-line',
-  danger: 'bg-rec/90 text-white hover:bg-rec',
-  outline: 'border border-line text-fg hover:bg-surface',
+  primary: 'hw-primary text-white',
+  ghost: 'text-muted hover:text-fg hover:bg-white/[0.04]',
+  subtle: 'hw text-fg',
+  danger: 'bg-rec text-white border border-[#b91c1c] shadow-[inset_0_1px_0_rgb(255_255_255/0.2)] hover:brightness-110',
+  outline: 'border border-line text-fg hover:bg-white/[0.04]',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -17,9 +17,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button({ variant = 'subtle', size = 'md', icon, tip, className = '', children, ...rest }, ref) {
-  const sz = size === 'sm' ? 'h-7 px-2.5 text-xs gap-1.5' : size === 'lg' ? 'h-11 px-5 text-sm gap-2' : 'h-8 px-3 text-[13px] gap-2';
+  // rótulos de tecla: mayúsculas anchas con espaciado, como serigrafía
+  const sz = size === 'sm' ? 'h-7 px-2.5 text-[10px] gap-1.5' : size === 'lg' ? 'h-11 px-5 text-[12px] gap-2' : 'h-8 px-3 text-[11px] gap-2';
   return (
-    <button ref={ref} type="button" data-tip={tip} className={`inline-flex items-center justify-center rounded-md font-medium transition-colors duration-150 disabled:opacity-40 ${sz} ${variants[variant]} ${className}`} {...rest}>
+    <button ref={ref} type="button" data-tip={tip} className={`inline-flex items-center justify-center rounded-sm font-bold uppercase tracking-[0.1em] [font-stretch:112%] transition-[background,transform,box-shadow] duration-100 disabled:opacity-40 ${sz} ${variants[variant]} ${className}`} {...rest}>
       {icon}
       {children}
     </button>
@@ -64,8 +65,10 @@ export function LetterToggle({ letter, label, active, color, onClick, disabled }
       disabled={disabled}
       onClick={onClick}
       onPointerDown={(e) => e.stopPropagation()}
-      className="h-6 w-6 shrink-0 rounded text-[11px] font-bold transition-colors disabled:opacity-40"
-      style={active ? { background: color, color: '#0B0E14' } : { background: '#1C2330', color: '#9BA7B7', boxShadow: 'inset 0 0 0 1px #293241' }}
+      className="relative h-6 w-6 shrink-0 rounded-sm text-[10px] font-extrabold [font-stretch:125%] transition-[transform] active:translate-y-px disabled:opacity-40"
+      style={active
+        ? { background: `linear-gradient(180deg, ${color}, color-mix(in srgb, ${color} 75%, #000))`, color: '#0B0E14', boxShadow: `inset 0 1px 0 rgb(255 255 255 / .35), 0 0 10px -2px ${color}` }
+        : { background: 'linear-gradient(180deg,#252D3B,#1B212C)', color: '#9BA7B7', boxShadow: 'inset 0 1px 0 rgb(255 255 255 / .06), inset 0 0 0 1px #2E3747, 0 1px 0 rgb(0 0 0 / .5)' }}
     >
       {letter}
     </button>

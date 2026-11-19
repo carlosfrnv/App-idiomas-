@@ -34,20 +34,27 @@ export function Meter({ read, width = 10, height = 160, orientation = 'vertical'
     const grad = vertical ? g.createLinearGradient(0, H, 0, 0) : g.createLinearGradient(0, 0, W, 0);
     const z0 = (-18 - FLOOR) / (6 - FLOOR), z1 = (-6 - FLOOR) / (6 - FLOOR), z2 = (0 - FLOOR) / (6 - FLOOR);
     grad.addColorStop(0, '#16a34a'); grad.addColorStop(z0, '#22C55E'); grad.addColorStop(z1, '#F59E0B'); grad.addColorStop(z2, '#EF4444'); grad.addColorStop(1, '#EF4444');
+    // LED segmentados: verde → ámbar (−18 dB) → rojo (−6 dB); apagados en tono oscuro
+    const seg = Math.max(2, Math.round(3 * dpr));
+    const gapPx = Math.max(1, Math.round(dpr));
+    const count = Math.floor(len / (seg + gapPx));
+    const colorAt = (f: number) => (f >= z2 ? '#EF4444' : f >= z1 ? '#F59E0B' : '#22C55E');
     for (let i = 0; i < n; i++) {
       const v = vals[Math.min(i, vals.length - 1)];
       const o = i * (bw + gap);
-      g.fillStyle = '#0B0E14';
-      if (vertical) g.fillRect(o, 0, bw, H); else g.fillRect(0, o, W, bw);
-      const l = norm(v.level) * len;
-      g.fillStyle = grad;
-      if (vertical) g.fillRect(o, H - l, bw, l); else g.fillRect(0, o, l, bw);
-      const h = norm(v.hold) * len;
-      if (h > 1) {
-        g.fillStyle = v.hold >= 0.999 ? '#EF4444' : '#F5F7FA';
-        if (vertical) g.fillRect(o, H - h, bw, Math.max(1, dpr)); else g.fillRect(h - dpr, o, Math.max(1, dpr), bw);
+      const lit = norm(v.level);
+      const hold = norm(v.hold);
+      for (let k = 0; k < count; k++) {
+        const f = (k + 0.5) / count;
+        const on = f <= lit;
+        const isHold = hold > 0.02 && Math.abs(f - hold) < 0.5 / count;
+        g.fillStyle = on || isHold ? colorAt(f) : 'rgba(255,255,255,0.045)';
+        g.globalAlpha = on || isHold ? 1 : 1;
+        const p0 = k * (seg + gapPx);
+        if (vertical) g.fillRect(o, H - p0 - seg, bw, seg); else g.fillRect(p0, o, seg, bw);
       }
     }
+    void grad;
     // marca de 0 dBFS
     g.fillStyle = 'rgba(245,247,250,0.25)';
     const zp = z2 * len;

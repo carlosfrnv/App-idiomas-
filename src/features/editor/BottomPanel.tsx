@@ -26,15 +26,15 @@ export function BottomPanel() {
     el.addEventListener('pointerup', up);
   };
   return (
-    <div className="flex shrink-0 flex-col border-t border-line bg-panel" style={{ height: panel ? bottomHeight : 36 }}>
+    <div className="flex shrink-0 flex-col border-t border-[#0B0E14] bg-panel shadow-[inset_0_1px_0_rgb(255_255_255/0.04)]" style={{ height: panel ? bottomHeight : 36 }}>
       {panel && <div className="-mt-1 h-2 cursor-ns-resize touch-none" onPointerDown={startResize} aria-label="Redimensionar panel" />}
-      <div className="flex h-8 shrink-0 items-center gap-1 border-b border-line px-2">
+      <div className="grooves flex h-8 shrink-0 items-end gap-0.5 border-b border-line px-2">
         {TABS.map((t) => (
           <button
             key={t.id}
             data-testid={`tab-${t.id}`}
             onClick={() => useUi.getState().set({ bottomPanel: panel === t.id ? null : t.id })}
-            className={`flex h-7 items-center gap-1.5 rounded-md px-2.5 text-[12px] font-medium ${panel === t.id ? 'bg-surface text-fg' : 'text-muted hover:text-fg'}`}
+            className={`silk relative flex h-7 items-center gap-1.5 rounded-t-sm px-3 text-[9.5px] ${panel === t.id ? 'bg-bg/70 text-fg shadow-[inset_0_2px_0_#8B5CF6]' : 'text-dim hover:text-muted'}`}
           >
             {t.icon}{t.label}
           </button>

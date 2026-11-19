@@ -218,7 +218,7 @@ export function LibraryPanel({ onImport }: { onImport: () => void }) {
         <IconButton label="Ocultar biblioteca" tipPos="right" onClick={() => useUi.getState().set({ libraryOpen: false })}><ChevronLeft size={16} /></IconButton>
       </nav>
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex h-10 shrink-0 items-center border-b border-line px-3 text-[12px] font-semibold">{current.label}</div>
+        <div className="grooves silk flex h-10 shrink-0 items-center border-b border-line px-3 text-[10px] text-muted">{current.label}</div>
         <div className="min-h-0 flex-1 overflow-y-auto p-2">
           {tab === 'files' && <><DropZone onImport={onImport} /><AssetList filter={() => true} empty="Aún no has importado audio." /></>}
           {tab === 'beats' && <><DropZone onImport={onImport} /><AssetList filter={(a) => a.kind !== 'recording'} empty="Importa una instrumental o genera una en la Biblioteca de sonidos." /><div className="mt-3"><Button size="sm" variant="ghost" icon={<Library size={13} />} onClick={() => useUi.getState().set({ libraryTab: 'sounds' })}>Ver instrumentales de ejemplo</Button></div></>}

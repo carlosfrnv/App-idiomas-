@@ -140,7 +140,7 @@ function ClipViewImpl({ clip, track, height, pxPerSec, scrollTime, viewportWidth
     <div
       data-testid="clip"
       data-clip-id={clip.id}
-      className={`group absolute top-[3px] overflow-hidden rounded-[5px] ${locked ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
+      className={`group absolute top-[3px] overflow-hidden rounded-[2px] ${locked ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
       style={{
         left,
         width,
@@ -152,7 +152,7 @@ function ClipViewImpl({ clip, track, height, pxPerSec, scrollTime, viewportWidth
       onContextMenu={onContextMenu}
       onDoubleClick={(e) => e.stopPropagation()}
     >
-      <div className="pointer-events-none flex h-4 items-center gap-1.5 px-1.5 text-[10px] font-semibold" style={{ background: `color-mix(in srgb, ${track.color} ${selected ? 55 : 35}%, transparent)`, marginLeft: Math.max(0, -left), maxWidth: visW }}>
+      <div className="pointer-events-none flex h-4 items-center gap-1.5 px-1.5 text-[9px] font-bold uppercase tracking-[0.08em] [font-stretch:112%]" style={{ background: `color-mix(in srgb, ${track.color} ${selected ? 55 : 35}%, transparent)`, marginLeft: Math.max(0, -left), maxWidth: visW }}>
         <span className="truncate text-fg/95">{clip.name}</span>
         {gainLabel && <span className="shrink-0 font-mono text-fg/70">{gainLabel}</span>}
       </div>

@@ -16,10 +16,10 @@ export function Modal({ open, onClose, title, subtitle, children, footer, width 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-[2px] animate-fade-in" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div ref={ref} role="dialog" aria-modal="true" aria-label={title} className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-xl border border-line bg-panel shadow-[0_24px_80px_-20px_rgb(0_0_0/0.9)] animate-pop" style={{ maxWidth: width }}>
-        <div className="flex items-start gap-3 border-b border-line px-5 py-4">
-          {icon && <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-surface text-primary">{icon}</div>}
+        <div className="grooves flex items-start gap-3 border-b border-line px-5 py-4">
+          {icon && <div className="hw mt-0.5 flex h-9 w-9 items-center justify-center rounded-sm text-primary">{icon}</div>}
           <div className="min-w-0 flex-1">
-            <h2 className="text-[15px] font-semibold">{title}</h2>
+            <h2 className="text-[17px] font-extrabold tracking-[-0.01em] [font-stretch:125%]">{title}</h2>
             {subtitle && <p className="mt-0.5 text-xs text-muted">{subtitle}</p>}
           </div>
           <button data-close type="button" aria-label="Cerrar" onClick={onClose} className="rounded-md p-1.5 text-muted hover:bg-surface hover:text-fg"><X size={16} /></button>

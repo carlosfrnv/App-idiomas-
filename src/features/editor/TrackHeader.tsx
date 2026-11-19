@@ -84,7 +84,7 @@ function TrackHeaderImpl({ track, index, height, selected, compact, onReorderSta
               onPointerDown={(e) => e.stopPropagation()}
             />
           ) : (
-            <button className="min-w-0 flex-1 truncate text-left text-[13px] font-medium" onDoubleClick={() => setEditing(true)} data-tip="Doble clic para renombrar" data-testid="track-name">
+            <button className="min-w-0 flex-1 truncate text-left text-[12.5px] font-bold [font-stretch:112%]" onDoubleClick={() => setEditing(true)} data-tip="Doble clic para renombrar" data-testid="track-name">
               {track.name}
             </button>
           )}

@@ -84,6 +84,7 @@ test('dividir, mover, recortar, duplicar, eliminar, deshacer y rehacer', async (
 
   // los atajos no se disparan mientras se escribe
   await page.getByTestId('project-name').click();
+  await page.keyboard.press('End');
   await page.keyboard.type(' s');
   await expect(page.getByTestId('clip')).toHaveCount(2);
   await expect(page.getByTestId('project-name')).toHaveValue(/ s$/);

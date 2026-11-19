@@ -81,19 +81,28 @@ export function Knob({ value, min, max, defaultValue, onChange, onCommit, label,
         style={{ width: size, height: size }}
       >
         <svg width={size} height={size}>
-          <circle cx={size / 2} cy={size / 2} r={r - 4} fill="#1C2330" stroke="#0B0E14" strokeWidth={1} />
-          <path d={arc(a0, a1)} stroke="#2a3344" strokeWidth={3} fill="none" strokeLinecap="round" />
-          {Math.abs(ang - center) > 0.5 && <path d={ang > center ? arc(center, ang) : arc(ang, center)} stroke={color} strokeWidth={3} fill="none" strokeLinecap="round" />}
+          {/* marcas de escala serigrafiadas */}
+          {Array.from({ length: 11 }, (_, i) => {
+            const a = ((a0 + (i / 10) * (a1 - a0) - 90) * Math.PI) / 180;
+            const r1 = size / 2 - 1, r2 = size / 2 - (i % 5 === 0 ? 4.5 : 3);
+            return <line key={i} x1={size / 2 + r1 * Math.cos(a)} y1={size / 2 + r1 * Math.sin(a)} x2={size / 2 + r2 * Math.cos(a)} y2={size / 2 + r2 * Math.sin(a)} stroke={i / 10 <= norm + 1e-6 && (!bipolar || true) ? color : '#3A4558'} strokeOpacity={i / 10 <= norm + 1e-6 ? 0.9 : 1} strokeWidth={1} />;
+          })}
+          {/* capuchón moleteado */}
+          <circle cx={size / 2} cy={size / 2} r={r - 5} fill="url(#knob-cap)" stroke="#0B0E14" strokeWidth={1} />
+          <defs>
+            <radialGradient id="knob-cap" cx="40%" cy="30%" r="80%"><stop offset="0" stopColor="#3A4456" /><stop offset="0.6" stopColor="#1E2531" /><stop offset="1" stopColor="#141922" /></radialGradient>
+          </defs>
+          {Math.abs(ang - center) > 0.5 && <path d={ang > center ? arc(center, ang) : arc(ang, center)} stroke={color} strokeWidth={2} fill="none" strokeOpacity={0.55} transform={`scale(${(r - 4.5) / r}) translate(${(size / 2) * (r / (r - 4.5) - 1)} ${(size / 2) * (r / (r - 4.5) - 1)})`} />}
           <line
-            x1={size / 2} y1={size / 2}
+            x1={size / 2 + (r - 14 > 3 ? 3 : 1) * Math.cos(((ang - 90) * Math.PI) / 180)} y1={size / 2 + (r - 14 > 3 ? 3 : 1) * Math.sin(((ang - 90) * Math.PI) / 180)}
             x2={size / 2 + (r - 7) * Math.cos(((ang - 90) * Math.PI) / 180)}
             y2={size / 2 + (r - 7) * Math.sin(((ang - 90) * Math.PI) / 180)}
-            stroke="#F5F7FA" strokeWidth={2} strokeLinecap="round"
+            stroke="#F5F7FA" strokeWidth={2} strokeLinecap="square"
           />
         </svg>
       </div>
-      {label && showValue && <div className="text-[10px] font-semibold uppercase tracking-wider text-dim leading-none">{label}</div>}
-      {showValue && <div className="font-mono text-[10px] text-muted tnum leading-none">{text}</div>}
+      {label && showValue && <div className="label-xs leading-none">{label}</div>}
+      {showValue && <div className="font-mono text-[9px] text-muted tnum leading-none">{text}</div>}
     </div>
   );
 }

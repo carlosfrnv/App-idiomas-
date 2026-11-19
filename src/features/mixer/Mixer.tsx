@@ -62,9 +62,9 @@ function FaderArea({ children }: { children: (h: number) => React.ReactNode }) {
 const ChannelStrip = memo(function ChannelStrip({ track, selected }: { track: Track; selected: boolean }) {
   const fxCount = track.effects.filter((e) => e.enabled).length;
   return (
-    <div data-testid="channel-strip" data-track-id={track.id} onPointerDown={() => useUi.getState().set({ selectedTrackId: track.id, fxTarget: track.id })} className={`flex w-[96px] shrink-0 flex-col items-center gap-1.5 rounded-lg border px-1.5 py-2 *:shrink-0 ${selected ? 'border-[#3a4558] bg-surface' : 'border-line bg-panel'}`}>
-      <div className="h-1 w-full rounded-full" style={{ background: track.color }} />
-      <div className="w-full truncate text-center text-[11px] font-semibold leading-4" title={track.name}>{track.name}</div>
+    <div data-testid="channel-strip" data-track-id={track.id} onPointerDown={() => useUi.getState().set({ selectedTrackId: track.id, fxTarget: track.id })} className={`flex w-[96px] shrink-0 flex-col items-center gap-1.5 rounded-sm border px-1.5 py-2 *:shrink-0 shadow-[inset_0_1px_0_rgb(255_255_255/0.05),0_2px_6px_-2px_rgb(0_0_0/0.6)] ${selected ? 'border-[#3a4558] bg-gradient-to-b from-[#202837] to-[#171C25]' : 'border-[#0B0E14] bg-gradient-to-b from-[#1A202A] to-[#141922]'}`}>
+      <div className="flex w-full items-center justify-between px-0.5"><span className="screw" /><span className="h-1.5 w-1.5 rounded-full" style={{ background: track.color, boxShadow: `0 0 6px ${track.color}` }} /><span className="screw" /></div>
+      <div className="w-full truncate border-y border-[#0B0E14] bg-bg/60 py-0.5 text-center text-[9.5px] font-bold uppercase leading-4 tracking-[0.1em] [font-stretch:112%]" style={{ color: track.color }} title={track.name}>{track.name}</div>
       <button
         onClick={() => useUi.getState().set({ fxTarget: track.id, selectedTrackId: track.id, bottomPanel: 'fx' })}
         className="flex h-6 w-full items-center justify-center gap-1 rounded border border-line bg-bg/60 text-[10px] font-semibold text-muted hover:text-fg"
@@ -97,9 +97,9 @@ function MasterStrip() {
   const vol = useProject((s) => s.doc.masterVolume);
   const fxCount = useProject((s) => s.doc.masterEffects.filter((e) => e.enabled).length);
   return (
-    <div data-testid="master-strip" className="flex w-[118px] shrink-0 flex-col items-center gap-1.5 rounded-lg border border-primary/40 bg-gradient-to-b from-primary/10 to-panel px-2 py-2 *:shrink-0">
-      <div className="h-1 w-full rounded-full bg-primary" />
-      <div className="text-[11px] font-bold leading-4 tracking-[0.16em]">MASTER</div>
+    <div data-testid="master-strip" className="flex w-[118px] shrink-0 flex-col items-center gap-1.5 rounded-sm border border-primary/40 bg-gradient-to-b from-[#221a3a] to-[#141922] px-2 py-2 shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] *:shrink-0">
+      <div className="flex w-full items-center justify-between px-0.5"><span className="screw" /><span className="h-1.5 w-1.5 rounded-full bg-primary shadow-[0_0_6px_#8B5CF6]" /><span className="screw" /></div>
+      <div className="silk w-full border-y border-[#0B0E14] bg-bg/60 py-0.5 text-center text-[10px] leading-4 text-primary">Master</div>
       <button onClick={() => useUi.getState().set({ fxTarget: 'master', bottomPanel: 'fx' })} className="flex h-6 w-full items-center justify-center gap-1 rounded border border-line bg-bg/60 text-[10px] font-semibold text-muted hover:text-fg">
         <SlidersHorizontal size={11} /> FX {fxCount > 0 && <span className="rounded bg-primary/25 px-1 text-primary">{fxCount}</span>}
       </button>
