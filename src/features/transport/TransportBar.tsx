@@ -12,7 +12,7 @@ import { IconButton } from '@/components/ui/Button';
 import { Meter } from '@/components/ui/Meter';
 import { useIsMobile } from '@/hooks/useMediaQuery';
 
-function Clock() {
+function Clock({ compact = false }: { compact?: boolean }) {
   const clock = useRef<HTMLSpanElement>(null);
   const bars = useRef<HTMLSpanElement>(null);
   useFrame(() => {
@@ -23,11 +23,11 @@ function Clock() {
   });
   return (
     <div className="flex items-center gap-3 rounded-lg border border-line bg-bg px-3 py-1 shadow-[inset_0_1px_8px_rgb(0_0_0/0.4)]" aria-label="Posición">
-      <div className="flex flex-col items-end leading-none">
+      <div className={`flex-col items-end leading-none ${compact ? 'hidden' : 'flex'}`}>
         <span ref={bars} data-testid="clock-bars" className="font-mono text-[17px] font-semibold text-fg tnum">1.1.000</span>
         <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-dim">Compás</span>
       </div>
-      <div className="h-6 w-px bg-line" />
+      {!compact && <div className="h-6 w-px bg-line" />}
       <div className="flex flex-col items-end leading-none">
         <span ref={clock} data-testid="clock-time" className="font-mono text-[17px] font-semibold text-sky tnum">00:00.000</span>
         <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-wider text-dim">Tiempo</span>
@@ -81,7 +81,7 @@ export function TransportBar() {
         {!isMobile && <IconButton label="Seguir cabezal" active={follow} onClick={() => useTransport.getState().set({ follow: !follow })}><MoveRight size={17} /></IconButton>}
       </div>
 
-      <Clock />
+      <Clock compact={isMobile} />
 
       {recording && (
         <div className="flex items-center gap-2 rounded-md bg-rec/15 px-2.5 py-1 text-[11px] font-bold tracking-wider text-rec" data-testid="rec-indicator">
@@ -96,7 +96,7 @@ export function TransportBar() {
           <Mic size={15} className={inputOpen ? 'text-ok' : 'text-dim'} />
           <div className="flex flex-col items-start leading-tight">
             <span className="max-w-[160px] truncate text-[11px] font-medium">{inputOpen ? label || 'Micrófono' : 'Entrada de micrófono'}</span>
-            <span className="text-[10px] text-dim">{inputOpen ? 'Activa' : 'Sin abrir — clic para configurar'}</span>
+            <span className="whitespace-nowrap text-[10px] text-dim">{inputOpen ? 'Activa' : 'Clic para configurar'}</span>
           </div>
           <Meter read={() => (inputOpen ? [recorder.readLevel()] : null)} channels={1} orientation="horizontal" width={70} height={6} />
         </button>

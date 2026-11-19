@@ -88,7 +88,7 @@ export function FxPanel() {
                 >
                   <span className="w-4 text-center font-mono text-[10px] text-dim">{i + 1}</span>
                   <span className={`flex-1 truncate text-[12px] font-medium ${e.enabled ? '' : 'text-dim line-through'}`}>{EFFECT_LABELS[e.type]}</span>
-                  <div className="hidden items-center gap-0.5 group-hover:flex">
+                  <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                     <IconButton label="Subir" size="sm" showTip={false} disabled={i === 0} onClick={(ev) => { ev.stopPropagation(); moveEffect(target, e.id, -1); }}><ArrowUp size={12} /></IconButton>
                     <IconButton label="Bajar" size="sm" showTip={false} disabled={i === effects.length - 1} onClick={(ev) => { ev.stopPropagation(); moveEffect(target, e.id, 1); }}><ArrowDown size={12} /></IconButton>
                     <IconButton label="Quitar" size="sm" showTip={false} onClick={(ev) => { ev.stopPropagation(); removeEffect(target, e.id); }}><Trash2 size={12} /></IconButton>
@@ -104,16 +104,16 @@ export function FxPanel() {
           </div>
         </div>
       </aside>
-      <section className="min-w-0 flex-1 overflow-y-auto p-4">
+      <section className="flex min-w-0 flex-1 flex-col overflow-y-auto p-4">
         {sel ? (
-          <div className="flex flex-col gap-4">
+          <div className="flex min-h-0 flex-1 flex-col gap-3">
             <div className="flex items-center gap-3">
               <h3 className="text-sm font-semibold">{EFFECT_LABELS[sel.type]}</h3>
               <span className="text-xs text-dim">{DESCRIPTIONS[sel.type]}</span>
               <div className="flex-1" />
               <label className="flex items-center gap-2 text-xs text-muted">{sel.enabled ? 'Activo' : 'Bypass'} <Switch label="Activar efecto" checked={sel.enabled} onChange={() => toggleEffect(target, sel.id)} /></label>
             </div>
-            <div className={sel.enabled ? '' : 'opacity-60'}><EffectEditor target={target} slot={sel} /></div>
+            <div className={`min-h-0 flex-1 ${sel.enabled ? '' : 'opacity-60'}`}><EffectEditor target={target} slot={sel} /></div>
           </div>
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-dim">Añade un efecto para editarlo aquí.</div>

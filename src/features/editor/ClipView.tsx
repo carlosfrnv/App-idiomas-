@@ -89,12 +89,15 @@ function ClipViewImpl({ clip, track, height, pxPerSec, scrollTime, viewportWidth
           return nd;
         }, { history: false });
       } else if (mode === 'trim-start' || mode === 'trim-end') {
-        const t = api.snap(api.timeAtClientX(ev.clientX), ev);
+        // desplazamiento relativo al punto de agarre: el borde no salta al pulsar
+        const o = origins.get(clip.id)!;
+        const edge0 = mode === 'trim-start' ? o.start : o.start + o.duration;
+        const t = api.snap(edge0 + dx / pxPerSec, ev);
         P.apply((d) => ops.trimClip({ ...d, clips: d.clips.map((c) => (c.id === clip.id ? origins.get(clip.id)! : c)) }, clip.id, mode === 'trim-start' ? 'start' : 'end', t, srcDur), { history: false });
       } else {
         const o = origins.get(clip.id)!;
-        const t = api.timeAtClientX(ev.clientX);
-        const v = mode === 'fade-in' ? t - o.start : o.start + o.duration - t;
+        const f0 = mode === 'fade-in' ? o.fadeIn : o.fadeOut;
+        const v = mode === 'fade-in' ? f0 + dx / pxPerSec : f0 - dx / pxPerSec;
         const fade = Math.max(0, Math.min(o.duration, v));
         P.apply((d) => ops.updateClip(d, clip.id, mode === 'fade-in' ? { fadeIn: fade } : { fadeOut: fade }), { history: false });
       }

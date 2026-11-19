@@ -1,4 +1,5 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useRef } from 'react';
+import { useElementSize } from '@/hooks/useElementSize';
 import { SlidersHorizontal } from 'lucide-react';
 import type { Track } from '@/types/project';
 import { useProject } from '@/state/projectStore';
@@ -42,17 +43,23 @@ function Scale({ height }: { height: number }) {
   const pos = (db: number) => { const g = Math.pow(10, db / 20); return g >= 1 ? 0.75 + (db / 6) * 0.25 : 0.75 - Math.pow(Math.min(1, -db / 60), 1 / 1.6) * 0.75; };
   return (
     <div className="relative w-5 shrink-0" style={{ height }} aria-hidden>
-      {DB_SCALE.map((db) => (
-        <span key={db} className="absolute right-0 -translate-y-1/2 font-mono text-[9px] text-dim" style={{ top: thumb / 2 + (1 - pos(db)) * travel }}>{db > 0 ? `+${db}` : db}</span>
+      {DB_SCALE.reduce<{ db: number; y: number }[]>((acc, db) => {
+        const y = thumb / 2 + (1 - pos(db)) * travel;
+        if (!acc.length || y - acc[acc.length - 1].y >= 11) acc.push({ db, y });
+        return acc;
+      }, []).map(({ db, y }) => (
+        <span key={db} className="absolute right-0 -translate-y-1/2 font-mono text-[9px] text-dim" style={{ top: y }}>{db > 0 ? `+${db}` : db}</span>
       ))}
     </div>
   );
 }
 
-const FIXED = 176;
+function FaderArea({ children }: { children: (h: number) => React.ReactNode }) {
+  const [ref, size] = useElementSize<HTMLDivElement>({ width: 0, height: 120 });
+  return <div ref={ref} className="flex min-h-[70px] w-full flex-1 !shrink justify-center">{children(Math.max(70, size.height))}</div>;
+}
 
-const ChannelStrip = memo(function ChannelStrip({ track, height, selected }: { track: Track; height: number; selected: boolean }) {
-  const faderH = Math.max(80, height - FIXED);
+const ChannelStrip = memo(function ChannelStrip({ track, selected }: { track: Track; selected: boolean }) {
   const fxCount = track.effects.filter((e) => e.enabled).length;
   return (
     <div data-testid="channel-strip" data-track-id={track.id} onPointerDown={() => useUi.getState().set({ selectedTrackId: track.id, fxTarget: track.id })} className={`flex w-[96px] shrink-0 flex-col items-center gap-1.5 rounded-lg border px-1.5 py-2 *:shrink-0 ${selected ? 'border-[#3a4558] bg-surface' : 'border-line bg-panel'}`}>
@@ -74,20 +81,21 @@ const ChannelStrip = memo(function ChannelStrip({ track, height, selected }: { t
       </div>
       <div className="font-mono text-[10px] text-dim">{Math.abs(track.pan) < 0.01 ? 'C' : track.pan < 0 ? `L${Math.round(-track.pan * 100)}` : `R${Math.round(track.pan * 100)}`}</div>
       <div className="w-[64px]"><ClipLed read={() => engine.trackClipped(track.id)} reset={() => engine.resetTrackClip(track.id)} /></div>
-      <div className="flex items-start gap-1">
-        <Scale height={faderH} />
-        <Fader gain={track.volume} label={`Volumen ${track.name}`} color={track.color} height={faderH} onChange={(g) => updateTrack(track.id, { volume: g }, 'vol')} />
-        <Meter read={() => engine.readTrackMeter(track.id)} width={12} height={faderH} />
-      </div>
+      <FaderArea>{(h) => (
+        <div className="flex items-start gap-1">
+          <Scale height={h} />
+          <Fader gain={track.volume} label={`Volumen ${track.name}`} color={track.color} height={h} onChange={(g) => updateTrack(track.id, { volume: g }, 'vol')} />
+          <Meter read={() => engine.readTrackMeter(track.id)} width={12} height={h} />
+        </div>
+      )}</FaderArea>
       <div className="font-mono text-[11px] font-semibold leading-4 tnum" data-testid="strip-db">{formatDb(track.volume)} dB</div>
     </div>
   );
 });
 
-function MasterStrip({ height }: { height: number }) {
+function MasterStrip() {
   const vol = useProject((s) => s.doc.masterVolume);
   const fxCount = useProject((s) => s.doc.masterEffects.filter((e) => e.enabled).length);
-  const faderH = Math.max(80, height - FIXED);
   return (
     <div data-testid="master-strip" className="flex w-[118px] shrink-0 flex-col items-center gap-1.5 rounded-lg border border-primary/40 bg-gradient-to-b from-primary/10 to-panel px-2 py-2 *:shrink-0">
       <div className="h-1 w-full rounded-full bg-primary" />
@@ -101,11 +109,13 @@ function MasterStrip({ height }: { height: number }) {
       </div>
       <div className="h-[14px]" />
       <div className="w-[80px]"><ClipLed read={() => engine.masterClipped()} reset={() => engine.resetMasterClip()} /></div>
-      <div className="flex items-start gap-1">
-        <Scale height={faderH} />
-        <Fader gain={vol} label="Volumen master" height={faderH} onChange={(g) => useProject.getState().apply((d) => ({ ...d, masterVolume: g }), { key: 'master-vol' })} />
-        <Meter read={() => engine.readMasterMeter()} width={22} height={faderH} />
-      </div>
+      <FaderArea>{(h) => (
+        <div className="flex items-start gap-1">
+          <Scale height={h} />
+          <Fader gain={vol} label="Volumen master" height={h} onChange={(g) => useProject.getState().apply((d) => ({ ...d, masterVolume: g }), { key: 'master-vol' })} />
+          <Meter read={() => engine.readMasterMeter()} width={22} height={h} />
+        </div>
+      )}</FaderArea>
       <div className="font-mono text-[11px] font-semibold leading-4 tnum">{formatDb(vol)} dB</div>
     </div>
   );
@@ -114,21 +124,12 @@ function MasterStrip({ height }: { height: number }) {
 export function Mixer() {
   const tracks = useProject((s) => s.doc.tracks);
   const selected = useUi((s) => s.selectedTrackId);
-  const ref = useRef<HTMLDivElement>(null);
-  const [h, setH] = useState(300);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([e]) => setH(e.contentRect.height));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
   return (
-    <div ref={ref} className="flex h-full gap-2 overflow-x-auto p-2" data-testid="mixer">
-      {tracks.map((t) => <ChannelStrip key={t.id} track={t} height={h - 16} selected={t.id === selected} />)}
+    <div className="flex h-full gap-2 overflow-x-auto overflow-y-hidden p-2" data-testid="mixer">
+      {tracks.map((t) => <ChannelStrip key={t.id} track={t} selected={t.id === selected} />)}
       {tracks.length === 0 && <div className="flex flex-1 items-center justify-center text-sm text-dim">Añade pistas para verlas en el mezclador.</div>}
       <div className="sticky right-0 ml-auto flex shrink-0 pl-2" style={{ background: 'linear-gradient(to right, transparent, #141922 12px)' }}>
-        <MasterStrip height={h - 16} />
+        <MasterStrip />
       </div>
     </div>
   );

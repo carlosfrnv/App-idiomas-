@@ -103,9 +103,11 @@ function TrackHeaderImpl({ track, index, height, selected, compact, onReorderSta
               {track.locked ? <Lock size={11} /> : <LockOpen size={11} />}
             </button>
           )}
-          <div className="ml-1 flex-1">
-            <Meter read={() => engine.readTrackMeter(track.id)} orientation="horizontal" width={compact ? 40 : 84} height={8} />
-          </div>
+          {!compact && (
+            <div className="ml-1 flex-1">
+              <Meter read={() => engine.readTrackMeter(track.id)} orientation="horizontal" width={84} height={8} />
+            </div>
+          )}
         </div>
         {showControls && (
           <div className="flex items-center gap-2">

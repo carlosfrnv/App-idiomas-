@@ -8,6 +8,7 @@ import { useProject } from '@/state/projectStore';
 import { delaySeconds, DELAY_DIVISION_BEATS } from '@/audio/fx/defaults';
 import { updateEffect, type FxTarget } from './fxActions';
 import { EqEditor } from './EqEditor';
+import { compressorCurve } from '@/audio/fx/compressorCurve';
 
 const ms = (v: number) => (v < 1 ? `${(v * 1000).toFixed(v < 0.01 ? 1 : 0)} ms` : `${v.toFixed(2)} s`);
 const pct = (v: number) => `${Math.round(v * 100)}%`;
@@ -38,19 +39,17 @@ function GainReduction({ target, fxId }: { target: FxTarget; fxId: string }) {
   );
 }
 
-function TransferCurve({ threshold, ratio, knee }: { threshold: number; ratio: number; knee: number }) {
+function TransferCurve({ threshold, ratio, knee, makeup }: { threshold: number; ratio: number; knee: number; makeup: number }) {
   const S = 96;
-  const map = (db: number) => ((db + 60) / 60) * S;
-  const out = (x: number) => {
-    const over = x - threshold;
-    if (2 * over < -knee) return x;
-    if (2 * Math.abs(over) <= knee) return x + ((1 / ratio - 1) * (over + knee / 2) ** 2) / (2 * Math.max(knee, 0.001));
-    return threshold + over / ratio;
-  };
+  const curve = compressorCurve(threshold, knee, ratio);
+  const map = (db: number) => ((db + 60) / 66) * S;
   let d = '';
-  for (let x = -60; x <= 0; x += 1) d += `${x === -60 ? 'M' : 'L'}${map(x)} ${S - map(out(x))} `;
+  for (let x = -60; x <= 6; x += 1) {
+    const y = Math.min(6, curve.staticOut(x) + makeup);
+    d += `${x === -60 ? 'M' : 'L'}${map(x).toFixed(1)} ${(S - map(y)).toFixed(1)} `;
+  }
   return (
-    <svg width={S} height={S} className="rounded-md border border-line bg-[#0D1118]" aria-label="Curva de transferencia">
+    <svg width={S} height={S} className="shrink-0 overflow-hidden rounded-md border border-line bg-[#0D1118]" aria-label="Curva de transferencia real del compresor">
       <path d={`M0 ${S} L${S} 0`} stroke="#293241" strokeDasharray="3 3" />
       <line x1={map(threshold)} x2={map(threshold)} y1={0} y2={S} stroke="#F59E0B55" />
       <path d={d} stroke="#C4B5FD" strokeWidth={2} fill="none" />
@@ -68,7 +67,7 @@ export function EffectEditor({ target, slot }: { target: FxTarget; slot: EffectS
       const p = slot.params;
       return (
         <Row>
-          <TransferCurve threshold={p.threshold} ratio={p.ratio} knee={p.knee} />
+          <TransferCurve threshold={p.threshold} ratio={p.ratio} knee={p.knee} makeup={p.makeup} />
           <Knob label="Umbral" value={p.threshold} min={-60} max={0} defaultValue={-18} format={dB} onChange={(v) => up({ threshold: v }, 'thr')} size={48} />
           <Knob label="Ratio" value={p.ratio} min={1} max={20} log defaultValue={3} format={(v) => `${v.toFixed(1)}:1`} onChange={(v) => up({ ratio: v }, 'ratio')} size={48} />
           <Knob label="Ataque" value={p.attack} min={0.0005} max={0.2} log defaultValue={0.01} format={ms} onChange={(v) => up({ attack: v }, 'att')} size={48} />

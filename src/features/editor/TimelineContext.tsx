@@ -16,5 +16,5 @@ export function useTimelineApi(): TimelineApi {
 
 export const RULER_H = 36;
 export const HEADER_W = 236;
-export const HEADER_W_MOBILE = 132;
+export const HEADER_W_MOBILE = 120;
 export const ASSET_MIME = 'application/x-sonora-asset';

@@ -6,6 +6,7 @@ import type { EffectSlot, EffectSlotOf, EffectType } from '@/types/effects';
 import { dbToGain } from '@/lib/audioMath';
 import { delaySeconds } from './defaults';
 import { GATE_PROCESSOR } from '@/audio/worklets/names';
+import { compressorCurve } from './compressorCurve';
 
 export interface FxContext { bpm: number; workletsReady: boolean }
 
@@ -117,7 +118,9 @@ export class CompressorProcessor extends BypassableEffect<'compressor'> {
     setParam(this.comp.attack, p.attack, this.ctx);
     setParam(this.comp.release, p.release, this.ctx);
     setParam(this.comp.knee, p.knee, this.ctx);
-    setParam(this.makeup.gain, dbToGain(p.makeup), this.ctx);
+    // anula la compensación automática interna del nodo: el Makeup del usuario es la única
+    const internal = compressorCurve(p.threshold, p.knee, Math.min(20, Math.max(1, p.ratio))).internalMakeupDb;
+    setParam(this.makeup.gain, dbToGain(p.makeup - internal), this.ctx);
   }
   reduction() { return this.comp.reduction; }
   dispose() { super.dispose(); this.comp.disconnect(); this.makeup.disconnect(); }
@@ -139,13 +142,19 @@ export class FilterProcessor extends BypassableEffect<'filter'> {
   dispose() { super.dispose(); this.f.disconnect(); }
 }
 
+/**
+ * Curva de saturación tanh con ganancia unidad a -12 dBFS (amplitud 0.25):
+ * por debajo realza ligeramente, por encima comprime suavemente; la salida nunca supera
+ * ~0.25/tanh(0.25·k) ≤ 1, así que "más drive" = más armónicos, no más volumen.
+ */
+export const SAT_REF = 0.25;
 export function saturationCurve(drive: number, n = 2048): Float32Array<ArrayBuffer> {
-  const k = 1 + drive * 24;
-  const norm = Math.tanh(k);
+  const k = 1 + Math.max(0, Math.min(1, drive)) * 24;
+  const g = (k * SAT_REF) / Math.tanh(k * SAT_REF);
   const curve = new Float32Array(new ArrayBuffer(n * 4));
   for (let i = 0; i < n; i++) {
     const x = (i / (n - 1)) * 2 - 1;
-    curve[i] = Math.tanh(k * x) / norm;
+    curve[i] = (g * Math.tanh(k * x)) / k;
   }
   return curve;
 }
@@ -176,8 +185,6 @@ export class SaturationProcessor extends BypassableEffect<'saturation'> {
       this.shaper.curve = saturationCurve(p.drive);
       this.lastDrive = p.drive;
     }
-    // compensación aproximada de nivel para que "más drive" no sea sólo "más volumen"
-    setParam(this.trim.gain, 1 / (1 + p.drive * 0.5), this.ctx);
     setParam(this.tone.frequency, 1500 * Math.pow(12, p.tone), this.ctx);
     setParam(this.wetMix.gain, p.mix, this.ctx);
     setParam(this.dryMix.gain, 1 - p.mix, this.ctx);

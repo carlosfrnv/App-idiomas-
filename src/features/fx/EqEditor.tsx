@@ -36,7 +36,7 @@ export function EqEditor({ target, slot }: { target: FxTarget; slot: EffectSlotO
   useEffect(() => {
     const el = wrap.current;
     if (!el) return;
-    const ro = new ResizeObserver(([e]) => setSize({ w: Math.max(200, e.contentRect.width), h: 210 }));
+    const ro = new ResizeObserver(([e]) => setSize({ w: Math.max(200, Math.floor(e.contentRect.width)), h: Math.max(110, Math.floor(e.contentRect.height)) }));
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
@@ -156,8 +156,8 @@ export function EqEditor({ target, slot }: { target: FxTarget; slot: EffectSlotO
   const b = bands[sel] ?? bands[0];
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-3">
-      <div className="flex items-center gap-2">
+    <div className="flex h-full min-h-[300px] flex-col gap-3">
+      <div className="flex shrink-0 items-center gap-2">
         <span className="label-xs">Preset</span>
         <select aria-label="Preset de ecualizador" className="h-7 rounded-md border border-line bg-bg px-2 text-xs outline-none focus:border-primary" defaultValue="" onChange={(e) => { const p = EQ_PRESETS.find((x) => x.id === e.target.value); if (p) updateEffect<'eq'>(target, slot.id, { bands: p.bands() }); e.currentTarget.value = ''; }}>
           <option value="" disabled>Elegir preset vocal…</option>
@@ -166,7 +166,7 @@ export function EqEditor({ target, slot }: { target: FxTarget; slot: EffectSlotO
         <div className="flex-1" />
         <span className="text-[11px] text-dim">Arrastra los puntos · rueda = Q · doble clic = activar/desactivar</span>
       </div>
-      <div ref={wrap} className="relative w-full shrink-0 overflow-hidden rounded-lg border border-line bg-[#0D1118]" style={{ height: size.h }}>
+      <div ref={wrap} className="relative min-h-[110px] w-full flex-1 overflow-hidden rounded-lg border border-line bg-[#0D1118]">
         <canvas ref={spec} className="pointer-events-none absolute inset-0" style={{ width: size.w, height: size.h }} />
         <canvas ref={canvas} className="pointer-events-none absolute inset-0" style={{ width: size.w, height: size.h }} />
         <div
@@ -188,7 +188,7 @@ export function EqEditor({ target, slot }: { target: FxTarget; slot: EffectSlotO
           })}
         </div>
       </div>
-      <div className="flex min-h-0 flex-wrap items-end gap-x-5 gap-y-3">
+      <div className="flex shrink-0 flex-wrap items-end gap-x-5 gap-y-3">
         <div className="flex gap-1">
           {bands.map((band, i) => (
             <button key={band.id} onClick={() => setSel(i)} className={`flex h-8 w-8 items-center justify-center rounded-md border text-xs font-bold ${i === sel ? 'border-fg' : 'border-line'} ${band.enabled ? '' : 'opacity-40'}`} style={{ color: BAND_COLORS[i % BAND_COLORS.length] }} aria-label={`Banda ${i + 1}`}>{i + 1}</button>

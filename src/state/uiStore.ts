@@ -38,7 +38,7 @@ export const useUi = create<UiState>((set, get) => ({
   fxTarget: null,
   snap: true,
   bottomPanel: 'mixer',
-  bottomHeight: 330,
+  bottomHeight: 360,
   libraryOpen: true,
   libraryTab: 'files',
   exportOpen: false,
